@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "language": "اللغة"
+  },
+  "menu": {
+    "title": "قائمة الطعام"
+  },
+  "item": {
+    "back": "رجوع",
+    "price": "السعر",
+    "description": "الوصف",
+    "unavailable": "غير متوفر"
+  },
+  "category": {
+    "all": "الكل"
+  }
+}

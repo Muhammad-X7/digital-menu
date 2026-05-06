@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "language": "زمان"
+  },
+  "menu": {
+    "title": "مێنیوی خواردن"
+  },
+  "item": {
+    "back": "گەڕانەوە",
+    "price": "نرخ",
+    "description": "وەسف",
+    "unavailable": "بەردەست نییە"
+  },
+  "category": {
+    "all": "هەمووی"
+  }
+}

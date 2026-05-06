@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "language": "Language"
+  },
+  "menu": {
+    "title": "Our Menu"
+  },
+  "item": {
+    "back": "Back",
+    "price": "Price",
+    "description": "Description",
+    "unavailable": "Unavailable"
+  },
+  "category": {
+    "all": "All"
+  }
+}
