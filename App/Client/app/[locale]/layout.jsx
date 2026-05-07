@@ -38,6 +38,7 @@ export default async function LocaleLayout({ children, params }) {
       lang={locale}
       dir={dir}
       className={`${fontClass} ${playfair.variable}`}
+      data-scroll-behavior="smooth"
     >
       <body className={isRtl ? "font-arabic" : "font-latin"}>
         <NextIntlClientProvider messages={messages}>

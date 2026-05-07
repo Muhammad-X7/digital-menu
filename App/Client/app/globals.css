@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
 @import "tailwindcss";
 
 /* ─── Design Tokens ─────────────────────────────────────── */
 :root {
-  /* Brand — warm sand, not heavy brown */
+  /* Brand — warm sand */
   --brand-50: #faf8f5;
   --brand-100: #f4efe6;
   --brand-200: #e8dece;
@@ -31,7 +32,9 @@
   /* Surface */
   --surface: #ffffff;
   --surface-raised: #fdfcfa;
-  --background: #f8f6f2;
+  /* --background: #f0ebe3; */
+  --background: #ffffff;
+  /* warm beige matching il Piatto */
 
   /* Typography */
   --font-display: var(--font-playfair), "Noto Serif Arabic", Georgia, serif;

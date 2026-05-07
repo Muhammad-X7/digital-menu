@@ -7,9 +7,9 @@
     "build": "strapi build",
     "console": "strapi console",
     "deploy": "strapi deploy",
-    "dev": "strapi develop",
-    "develop": "strapi develop",
-    "start": "strapi start",
+    "dev": "node -r ./patch-ebusy.js node_modules/@strapi/strapi/bin/strapi.js develop",
+    "develop": "node -r ./patch-ebusy.js node_modules/@strapi/strapi/bin/strapi.js develop",
+    "start": "node -r ./patch-ebusy.js node_modules/@strapi/strapi/bin/strapi.js start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"

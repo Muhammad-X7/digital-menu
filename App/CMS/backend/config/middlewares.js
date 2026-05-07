@@ -26,12 +26,9 @@ module.exports = [
   {
     name: "strapi::cors",
     config: {
-      enabled: true,
       headers: "*",
       origin: [
-        // Production Vercel URL — update this to your actual domain
         "https://your-menu.vercel.app",
-        // Local development
         "http://localhost:3000",
         "http://127.0.0.1:3000",
       ],

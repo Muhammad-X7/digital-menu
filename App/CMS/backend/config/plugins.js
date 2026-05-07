@@ -2,28 +2,33 @@
 
 module.exports = ({ env }) => ({
   upload: {
+    enabled: true,
     config: {
       provider: "aws-s3",
       providerOptions: {
-        credentials: {
-          accessKeyId: env("AWS_ACCESS_KEY_ID"),
-          secretAccessKey: env("AWS_ACCESS_SECRET"),
+        s3Options: {
+          credentials: {
+            accessKeyId: env("AWS_ACCESS_KEY_ID"),
+            secretAccessKey: env("AWS_ACCESS_SECRET"),
+          },
+          endpoint: env("AWS_ENDPOINT"),
+          region: env("AWS_REGION"),
+          params: {
+            Bucket: env("AWS_BUCKET"),
+          },
+          s3ForcePathStyle: true,
         },
-        endpoint: env("AWS_ENDPOINT"),
-        region: env("AWS_REGION"),
-        params: {
-          Bucket: env("AWS_BUCKET"),
-        },
-        s3ForcePathStyle: true,
+        baseUrl: env("AWS_BASE_URL"),
       },
-      // Rewrite stored URLs to the public R2 domain so Next.js
-      // image optimization can fetch them without auth.
-      baseUrl: env("AWS_BASE_URL"),
       actionOptions: {
         upload: {},
         uploadStream: {},
         delete: {},
       },
+      sizeLimit: 10 * 1024 * 1024, // 10MB
+    },
+    security: {
+      strictSsrfCheck: true,
     },
   },
 

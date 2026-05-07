@@ -32,13 +32,29 @@ export async function getCategories(locale) {
     "pagination[pageSize]": 100,
     "fields[0]": "name",
     "fields[1]": "slug",
+    "fields[2]": "description",
+    "populate[0]": "image",        // ← add this
   });
 
-  return (data.data || []).map((item) => ({
-    id: item.id,
-    name: item.attributes?.name ?? item.name,
-    slug: item.attributes?.slug ?? item.slug,
-  }));
+  return (data.data || []).map((item) => {
+    const attrs = item.attributes ?? item;
+
+    const imageData = attrs.image?.data ?? attrs.image;
+    const imageAttrs = imageData?.attributes ?? imageData;
+    const imageUrl = imageAttrs?.url
+      ? imageAttrs.url.startsWith("http")
+        ? imageAttrs.url
+        : `${STRAPI_URL}${imageAttrs.url}`
+      : null;
+
+    return {
+      id: item.id,
+      name: attrs.name ?? item.name,
+      slug: attrs.slug ?? item.slug,
+      description: attrs.description ?? null,
+      imageUrl,                    // ← add this
+    };
+  });
 }
 
 /**
