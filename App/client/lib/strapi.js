@@ -33,7 +33,8 @@ export async function getCategories(locale) {
     "fields[0]": "name",
     "fields[1]": "slug",
     "fields[2]": "description",
-    "populate[0]": "image",        // ← add this
+    "populate[0]": "image",
+    "sort": "order:asc",           // ← added
   });
 
   return (data.data || []).map((item) => {
@@ -52,7 +53,7 @@ export async function getCategories(locale) {
       name: attrs.name ?? item.name,
       slug: attrs.slug ?? item.slug,
       description: attrs.description ?? null,
-      imageUrl,                    // ← add this
+      imageUrl,
     };
   });
 }
@@ -68,6 +69,7 @@ export async function getMenuItems(locale) {
     "populate[0]": "image",
     "populate[1]": "category",
     "pagination[pageSize]": 200,
+    "sort": "order:asc",           // ← added
   });
 
   return (data.data || []).map(normalizeMenuItem);
@@ -107,8 +109,8 @@ function normalizeMenuItem(item) {
   const categoryAttrs = categoryData?.attributes ?? categoryData;
 
   return {
-    id: item.documentId ?? item.id,  // Strapi v5: use documentId for single-item URL; fall back to numeric id for v4
-    numericId: item.id,              // kept if you ever need the numeric id
+    id: item.documentId ?? item.id,
+    numericId: item.id,
     name: attrs.name,
     description: attrs.description,
     price: attrs.price,
