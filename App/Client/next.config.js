@@ -28,3 +28,4 @@ const nextConfig = {
 
 // 2. WRAP and EXPORT the config (This is the missing step)
 export default withNextIntl(nextConfig);
+
