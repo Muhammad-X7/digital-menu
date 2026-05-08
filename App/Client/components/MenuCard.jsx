@@ -1,147 +1,101 @@
 import Image from "next/image";
 
 export default function MenuCard({ item, index = 0, onClick }) {
-  return (
-    <button
-      onClick={() => onClick(item)}
-      className="menu-card card-lift animate-fade-up"
-      style={{
-        borderRadius: "var(--radius-lg)",
-        overflow: "hidden",
-        background: "var(--surface)",
-        border: "1px solid var(--ink-100)",
-        animationDelay: `${index * 50}ms`,
-        animationFillMode: "both",
-        opacity: 0,
-        cursor: "pointer",
-        padding: 0,
-        textAlign: "left",
-        width: "100%",
-      }}
-    >
-      {/* ── Desktop layout: vertical card ── */}
-      <div className="card-desktop">
-        <div style={{ position: "relative", width: "100%", paddingBottom: "75%" }}>
-          {item.imageUrl ? (
-            <Image
-              src={item.imageUrl}
-              alt={item.imageAlt || item.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 900px) 33vw, 300px"
-              loading={index === 0 ? "eager" : "lazy"}
-              priority={index === 0}
-            />
-          ) : (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ background: "var(--brand-100)", fontSize: "2rem" }}
-            >
-              🍬
+    return (
+        <button
+            onClick={() => onClick(item)}
+            className="menu-card card-lift animate-fade-up rounded-[var(--radius-lg)] overflow-hidden bg-white border border-ink-100 cursor-pointer p-0 text-left w-full opacity-0"
+            style={{
+                animationDelay: `${index * 50}ms`,
+                animationFillMode: "both",
+            }}
+        >
+            {/* ── Desktop layout: vertical card ── */}
+            <div className="flex flex-col sm:flex max-sm:hidden">
+                <div className="relative w-full pb-[75%]">
+                    {item.imageUrl ? (
+                        <Image
+                            src={item.imageUrl}
+                            alt={item.imageAlt || item.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 900px) 33vw, 300px"
+                            loading={index === 0 ? "eager" : "lazy"}
+                            priority={index === 0}
+                        />
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-brand-100 text-[2rem]">
+                            🍬
+                        </div>
+                    )}
+                    <div
+                        className="absolute inset-x-0 bottom-0 h-[40%] pointer-events-none"
+                        style={{
+                            background: "linear-gradient(to top, rgba(0,0,0,0.18), transparent)",
+                        }}
+                    />
+                </div>
+
+                <div className="px-3.5 pt-3 pb-3.5">
+                    <p
+                        className="line-clamp-2 text-[0.88rem] font-medium text-ink-900 leading-[1.35] mb-1.5"
+                        style={{ fontFamily: "var(--font-display)" }}
+                    >
+                        {item.name}
+                    </p>
+                    <div className="flex items-baseline justify-between">
+                        <span className="text-[0.92rem] font-bold text-gold-600 tracking-[-0.01em]">
+                            {Number(item.price).toLocaleString()}
+                        </span>
+                        <span className="text-[0.68rem] font-medium text-ink-400 tracking-[0.06em] uppercase">
+                            IQD
+                        </span>
+                    </div>
+                </div>
             </div>
-          )}
-          <div
-            className="absolute inset-x-0 bottom-0"
-            style={{
-              height: "40%",
-              background: "linear-gradient(to top, rgba(0,0,0,0.18), transparent)",
-              pointerEvents: "none",
-            }}
-          />
-        </div>
 
-        <div style={{ padding: "12px 14px 14px" }}>
-          <p
-            className="line-clamp-2"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "0.88rem",
-              fontWeight: 500,
-              color: "var(--ink-900)",
-              lineHeight: 1.35,
-              marginBottom: "6px",
-            }}
-          >
-            {item.name}
-          </p>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--gold-600)", letterSpacing: "-0.01em" }}>
-              {Number(item.price).toLocaleString()}
-            </span>
-            <span style={{ fontSize: "0.68rem", fontWeight: 500, color: "var(--ink-400)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              IQD
-            </span>
-          </div>
-        </div>
-      </div>
+            {/* ── Mobile layout: horizontal row ── */}
+            <div className="hidden max-sm:flex flex-row items-center gap-3.5 px-3.5 py-3">
+                <div className="relative w-[100px] shrink-0 rounded-[var(--radius-md)] overflow-hidden aspect-square">
+                    {item.imageUrl ? (
+                        <Image
+                            src={item.imageUrl}
+                            alt={item.imageAlt || item.name}
+                            fill
+                            className="object-cover"
+                            sizes="100px"
+                            loading={index === 0 ? "eager" : "lazy"}
+                            priority={index === 0}
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-brand-100 flex items-center justify-center text-[1.6rem]">
+                            🍬
+                        </div>
+                    )}
+                </div>
 
-      {/* ── Mobile layout: horizontal row ── */}
-      <div className="card-mobile">
-        <div style={{ position: "relative", width: "100px", flexShrink: 0, borderRadius: "var(--radius-md)", overflow: "hidden", aspectRatio: "1/1" }}>
-          {item.imageUrl ? (
-            <Image
-              src={item.imageUrl}
-              alt={item.imageAlt || item.name}
-              fill
-              className="object-cover"
-              sizes="100px"
-              loading={index === 0 ? "eager" : "lazy"}
-              priority={index === 0}
-            />
-          ) : (
-            <div style={{ width: "100%", height: "100%", background: "var(--brand-100)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem" }}>
-              🍬
+                <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                    <p
+                        className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.3]"
+                        style={{ fontFamily: "var(--font-display)" }}
+                    >
+                        {item.name}
+                    </p>
+                    {item.description && (
+                        <p className="line-clamp-1 text-[0.78rem] text-ink-400 leading-[1.4]">
+                            {item.description}
+                        </p>
+                    )}
+                    <div className="flex items-baseline gap-1 mt-0.5">
+                        <span className="text-[0.92rem] font-bold text-gold-600">
+                            {Number(item.price).toLocaleString()}
+                        </span>
+                        <span className="text-[0.65rem] font-medium text-ink-400 tracking-[0.06em] uppercase">
+                            IQD
+                        </span>
+                    </div>
+                </div>
             </div>
-          )}
-        </div>
-
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center", gap: "4px" }}>
-          <p
-            className="line-clamp-2"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              color: "var(--ink-900)",
-              lineHeight: 1.3,
-            }}
-          >
-            {item.name}
-          </p>
-          {item.description && (
-            <p
-              className="line-clamp-1"
-              style={{ fontSize: "0.78rem", color: "var(--ink-400)", lineHeight: 1.4 }}
-            >
-              {item.description}
-            </p>
-          )}
-          <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginTop: "2px" }}>
-            <span style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--gold-600)" }}>
-              {Number(item.price).toLocaleString()}
-            </span>
-            <span style={{ fontSize: "0.65rem", fontWeight: 500, color: "var(--ink-400)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              IQD
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        .menu-card .card-desktop { display: flex; flex-direction: column; }
-        .menu-card .card-mobile  { display: none; }
-
-        @media (max-width: 600px) {
-          .menu-card .card-desktop { display: none; }
-          .menu-card .card-mobile  {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 14px;
-          }
-        }
-      `}</style>
-    </button>
-  );
+        </button>
+    );
 }

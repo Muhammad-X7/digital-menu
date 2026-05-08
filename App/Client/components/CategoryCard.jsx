@@ -6,32 +6,10 @@ export default function CategoryCard({ category, onClick, index = 0 }) {
     return (
         <button
             onClick={onClick}
-            className="category-card-lift"
-            style={{
-                position: "relative",
-                width: "100%",
-                height: "230px",
-                borderRadius: "var(--radius-xl)",
-                overflow: "hidden",
-                background: "var(--brand-100)",
-                border: "none",
-                cursor: "pointer",
-                textAlign: "left",
-                padding: 0,
-                boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
-                transition: "transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s cubic-bezier(0.22,1,0.36,1)",
-            }}
+            className="category-card-lift relative w-full h-[230px] rounded-[var(--radius-xl)] overflow-hidden bg-brand-100 border-none cursor-pointer text-left p-0 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-[transform,box-shadow] duration-[220ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(60,40,10,0.12)]"
         >
             {/* Right: image occupies right 60% */}
-            <div
-                style={{
-                    position: "absolute",
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: "60%",
-                }}
-            >
+            <div className="absolute right-0 top-0 bottom-0 w-[60%]">
                 {category.imageUrl ? (
                     <Image
                         src={category.imageUrl}
@@ -43,82 +21,37 @@ export default function CategoryCard({ category, onClick, index = 0 }) {
                         loading={isFirst ? "eager" : "lazy"}
                     />
                 ) : (
-                    <div
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            background: "var(--brand-100)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "3rem",
-                        }}
-                    >
+                    <div className="w-full h-full bg-brand-100 flex items-center justify-center text-[3rem]">
                         🍬
                     </div>
                 )}
-                {/* * Layer over the card to match the image color to the card's background color.
-                  * We use 'to light' so the fade goes horizontally from opaque white to transparent.
-                  * The card background color is var(--brand-100).
-                  */}
+                {/* Gradient overlay to blend image into card background */}
                 <div
+                    className="absolute inset-0 pointer-events-none"
                     style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "linear-gradient(to right, var(--brand-100) 0%, rgba(255,255,255,0.3) 35%, transparent 65%)",
-                        pointerEvents: "none",
+                        background:
+                            "linear-gradient(to right, var(--color-brand-100) 0%, rgba(255,255,255,0.3) 35%, transparent 65%)",
                     }}
                 />
             </div>
 
             {/* Left: text */}
-            <div
-                style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: "55%",
-                    padding: "20px 24px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-end",
-                    zIndex: 2,
-                }}
-            >
+            <div className="absolute left-0 top-0 bottom-0 w-[55%] px-6 py-5 flex flex-col justify-end z-[2]">
                 <h2
+                    className="text-[1.15rem] font-bold text-ink-900 leading-[1.2]"
                     style={{
                         fontFamily: "var(--font-display)",
-                        fontSize: "1.15rem",
-                        fontWeight: 700,
-                        color: "var(--ink-900)",
-                        lineHeight: 1.2,
                         marginBottom: category.description ? "4px" : 0,
                     }}
                 >
                     {category.name}
                 </h2>
                 {category.description && (
-                    <p
-                        style={{
-                            fontSize: "0.78rem",
-                            color: "var(--ink-500)",
-                            lineHeight: 1.4,
-                            fontWeight: 400,
-                            margin: 0,
-                        }}
-                    >
+                    <p className="text-[0.78rem] text-ink-500 leading-[1.4] font-normal m-0">
                         {category.description}
                     </p>
                 )}
             </div>
-
-            <style>{`
-                .category-card-lift:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 16px 40px rgba(60,40,10,0.12);
-                }
-            `}</style>
         </button>
     );
 }
