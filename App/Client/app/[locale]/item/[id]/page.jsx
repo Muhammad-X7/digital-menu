@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getMenuItem } from "../../../../lib/strapi";
 import TopNavBar from "../../../../components/TopNavBar";
-import ItemDetail from "../../../../components/ItemDetail";
 
 export const revalidate = 60;
 
@@ -32,7 +31,6 @@ export default async function ItemPage({ params }) {
   return (
     <div className="min-h-screen">
       <TopNavBar />
-      <ItemDetail item={item} />
     </div>
   );
 }
