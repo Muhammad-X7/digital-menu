@@ -4,10 +4,12 @@ export default function MenuCard({ item, index = 0, onClick }) {
     return (
         <button
             onClick={() => onClick(item)}
-            className="menu-card card-lift animate-fade-up rounded-[var(--radius-lg)] overflow-hidden bg-white border border-ink-100 cursor-pointer p-0 text-left w-full opacity-0"
+            dir="rtl"
+            className="menu-card card-lift animate-fade-up rounded-[var(--radius-lg)] overflow-hidden bg-white border border-ink-100 cursor-pointer p-0 text-right w-full opacity-0"
             style={{
                 animationDelay: `${index * 50}ms`,
                 animationFillMode: "both",
+                fontFamily: "'Noto Sans Arabic', 'Segoe UI', sans-serif",
             }}
         >
             {/* ── Desktop layout: vertical card ── */}
@@ -43,19 +45,19 @@ export default function MenuCard({ item, index = 0, onClick }) {
                     >
                         {item.name}
                     </p>
-                    <div className="flex items-baseline justify-between">
-                        <span className="text-[0.92rem] font-bold text-gold-600 tracking-[-0.01em]">
-                            {Number(item.price).toLocaleString()}
+                    <div className="flex items-baseline justify-between flex-row-reverse">
+                        <span dir="ltr" className="text-[0.92rem] font-bold text-gold-600 tracking-[-0.01em]">
+                            {Number(item.price).toLocaleString("en-US").replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])}
                         </span>
                         <span className="text-[0.68rem] font-medium text-ink-400 tracking-[0.06em] uppercase">
-                            IQD
+                            د.ع
                         </span>
                     </div>
                 </div>
             </div>
 
-            {/* ── Mobile layout: horizontal row ── */}
-            <div className="hidden max-sm:flex flex-row items-center gap-3.5 px-3.5 py-3">
+            {/* ── Mobile layout: horizontal row (image left, text right) ── */}
+            <div className="hidden max-sm:flex flex-row-reverse items-center gap-3.5 px-3.5 py-3">
                 <div className="relative w-[100px] shrink-0 rounded-[var(--radius-md)] overflow-hidden aspect-square">
                     {item.imageUrl ? (
                         <Image
@@ -74,7 +76,7 @@ export default function MenuCard({ item, index = 0, onClick }) {
                     )}
                 </div>
 
-                <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 text-right">
                     <p
                         className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.3]"
                         style={{ fontFamily: "var(--font-display)" }}
@@ -82,16 +84,16 @@ export default function MenuCard({ item, index = 0, onClick }) {
                         {item.name}
                     </p>
                     {item.description && (
-                        <p className="line-clamp-1 text-[0.78rem] text-ink-400 leading-[1.4]">
+                        <p className="text-[0.78rem] text-ink-400 leading-[1.4] whitespace-normal break-words">
                             {item.description}
                         </p>
                     )}
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-[0.92rem] font-bold text-gold-600">
-                            {Number(item.price).toLocaleString()}
+                    <div className="flex items-baseline gap-1 mt-0.5 flex-row-reverse">
+                        <span dir="ltr" className="text-[0.92rem] font-bold text-gold-600">
+                            {Number(item.price).toLocaleString("en-US").replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])}
                         </span>
                         <span className="text-[0.65rem] font-medium text-ink-400 tracking-[0.06em] uppercase">
-                            IQD
+                            د.ع
                         </span>
                     </div>
                 </div>
