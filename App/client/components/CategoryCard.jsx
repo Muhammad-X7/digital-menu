@@ -1,10 +1,7 @@
 import Image from "next/image";
-import { useLocale } from "next-intl";
 
-export default function CategoryCard({ category, onClick, index = 0 }) {
+export default function CategoryCard({ category, onClick, index = 0, isRtl = false }) {
     const isFirst = index === 0;
-    const locale = useLocale();
-    const isRtl = locale === "ar" || locale === "ckb";
 
     return (
         <button

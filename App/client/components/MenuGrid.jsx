@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import CategoryCard from "./CategoryCard";
 import MenuCard from "./MenuCard";
 import ItemModal from "./ItemModal";
@@ -8,6 +9,9 @@ import ItemModal from "./ItemModal";
 export default function MenuGrid({ items, categories }) {
     const [activeCategory, setActiveCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
+    const t = useTranslations();
+    const locale = useLocale();
+    const isRtl = locale === "ar" || locale === "ckb";
 
     // If no category selected, show category cards grid (homepage)
     if (activeCategory === null) {
@@ -20,6 +24,7 @@ export default function MenuGrid({ items, categories }) {
                                 key={cat.id}
                                 category={cat}
                                 index={i}
+                                isRtl={isRtl}
                                 onClick={() => setActiveCategory(cat.id)}
                             />
                         ))}
@@ -27,7 +32,11 @@ export default function MenuGrid({ items, categories }) {
                 </main>
 
                 {selectedItem && (
-                    <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+                    <ItemModal
+                        item={selectedItem}
+                        isRtl={isRtl}
+                        onClose={() => setSelectedItem(null)}
+                    />
                 )}
             </div>
         );
@@ -45,7 +54,16 @@ export default function MenuGrid({ items, categories }) {
                     onClick={() => setActiveCategory(null)}
                     className="inline-flex items-center gap-1.5 text-[0.82rem] font-medium text-ink-700 bg-white border border-ink-100 rounded-full px-4 py-[7px] cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
                 >
-                    ← Back
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        className={`shrink-0 ${isRtl ? "rotate-180" : ""}`}
+                    >
+                        <path d="M11.5 7H2.5M2.5 7L6 3.5M2.5 7L6 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {t("item.back")}
                 </button>
                 <span
                     className="text-[1.1rem] font-semibold text-ink-900"
@@ -65,6 +83,7 @@ export default function MenuGrid({ items, categories }) {
                                 key={item.id}
                                 item={item}
                                 index={i}
+                                isRtl={isRtl}
                                 onClick={setSelectedItem}
                             />
                         ))}
@@ -73,20 +92,25 @@ export default function MenuGrid({ items, categories }) {
             </main>
 
             {selectedItem && (
-                <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+                <ItemModal
+                    item={selectedItem}
+                    isRtl={isRtl}
+                    onClose={() => setSelectedItem(null)}
+                />
             )}
         </div>
     );
 }
 
 function EmptyState() {
+    const t = useTranslations();
     return (
         <div className="flex flex-col items-center justify-center text-center pt-[80px] pb-[80px]">
             <div className="w-16 h-16 rounded-full bg-ink-100 flex items-center justify-center text-[1.8rem] mb-4">
                 🍬
             </div>
             <p className="text-[0.88rem] text-ink-400">
-                No items in this category
+                {t("item.unavailable")}
             </p>
         </div>
     );

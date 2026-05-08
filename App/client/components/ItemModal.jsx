@@ -4,8 +4,14 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
-export default function ItemModal({ item, onClose }) {
+export default function ItemModal({ item, isRtl = false, onClose }) {
     const t = useTranslations();
+
+    const formattedPrice = isRtl
+        ? Number(item.price).toLocaleString("en-US").replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
+        : Number(item.price).toLocaleString("en-US");
+
+    const currency = isRtl ? "د.ع" : "IQD";
 
     // Lock body scroll when open
     useEffect(() => {
@@ -40,6 +46,7 @@ export default function ItemModal({ item, onClose }) {
             <div
                 role="dialog"
                 aria-modal="true"
+                dir={isRtl ? "rtl" : "ltr"}
                 className={[
                     "fixed z-[201] bg-white rounded-[var(--radius-xl)] overflow-hidden",
                     "flex flex-row shadow-[0_32px_80px_rgba(0,0,0,0.22)]",
@@ -54,7 +61,7 @@ export default function ItemModal({ item, onClose }) {
                     "max-sm:[animation:sheetIn_0.30s_cubic-bezier(0.22,1,0.36,1)]",
                 ].join(" ")}
             >
-                {/* Left: Image */}
+                {/* Image: left for LTR, right for RTL (handled by dir) */}
                 <div className="relative w-[45%] max-sm:w-full shrink-0 bg-brand-100 min-h-[340px] max-sm:min-h-[220px]">
                     {item.imageUrl ? (
                         <Image
@@ -72,7 +79,7 @@ export default function ItemModal({ item, onClose }) {
                     )}
                 </div>
 
-                {/* Right: Details */}
+                {/* Details */}
                 <div className="flex-1 px-7 pt-8 pb-7 flex flex-col overflow-y-auto">
                     {/* Category badge */}
                     {item.categoryName && (
@@ -99,19 +106,19 @@ export default function ItemModal({ item, onClose }) {
                     {/* Price */}
                     <div className="flex items-baseline gap-1.5 mt-auto pt-5 border-t border-ink-100">
                         <span className="text-[2rem] font-extrabold text-gold-600 tracking-[-0.02em] leading-none">
-                            {Number(item.price).toLocaleString()}
+                            {formattedPrice}
                         </span>
                         <span className="text-[0.75rem] font-medium text-ink-400 tracking-[0.06em] uppercase">
-                            IQD
+                            {currency}
                         </span>
                     </div>
                 </div>
 
-                {/* Close button */}
+                {/* Close button — always on the white content side */}
                 <button
                     onClick={onClose}
-                    aria-label="Close"
-                    className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/95 border border-ink-100 cursor-pointer flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.12)] z-[1] text-[1.1rem] text-ink-700 leading-none"
+                    aria-label={t("item.back")}
+                    className={`absolute top-3.5 w-8 h-8 rounded-full bg-white/95 border border-ink-100 cursor-pointer flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.12)] z-[1] text-[1.1rem] text-ink-700 leading-none ${isRtl ? "left-3.5" : "right-3.5"}`}
                 >
                     ✕
                 </button>

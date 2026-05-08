@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-export default function CategoryBar({ categories, activeCategory, onSelect }) {
+export default function CategoryBar({ categories, activeCategory, onSelect, isRtl = false }) {
     const t = useTranslations();
 
     return (
