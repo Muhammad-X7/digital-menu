@@ -14,7 +14,7 @@ export const metadata = {
         siteName: "Jiggly Cake",
         images: [
             {
-                url: "https://digital-menu-swart.vercel.app/logo.jpg",
+                url: "https://digital-menu-swart.vercel.app/assets/logo.jpg",
                 width: 1200,
                 height: 630,
             },
@@ -25,7 +25,7 @@ export const metadata = {
         card: "summary_large_image",
         title: "Jiggly Cake",
         description: "Jiggly Cake — Japanese cheesecake, soft as silk.",
-        images: ["https://digital-menu-swart.vercel.app/logo.jpg"],
+        images: ["https://digital-menu-swart.vercel.app/assets/logo.jpg"],
     },
 };
 
