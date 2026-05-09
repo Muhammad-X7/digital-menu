@@ -2,9 +2,6 @@
   "nav": {
     "language": "Language"
   },
-  "menu": {
-    "title": "Our Menu"
-  },
   "item": {
     "back": "Back",
     "price": "Price",
