@@ -8,20 +8,18 @@ import MenuCard from "./MenuCard";
 import ItemModal from "./ItemModal";
 
 export default function MenuGrid({ items, categories, sections }) {
-    const [activeSection, setActiveSection] = useState(null); // null = All
-    const [activeCategory, setActiveCategory] = useState(null); // drill-down
+    const [activeSection, setActiveSection] = useState(null);
+    const [activeCategory, setActiveCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const t = useTranslations();
     const locale = useLocale();
     const isRtl = locale === "ar" || locale === "ckb";
 
-    // ── Which sections to render in the cards area ──────────────────────────
     const visibleSections =
         activeSection === null
             ? sections
             : sections.filter((s) => s.id === activeSection);
 
-    // ── Drill-down into a single category ───────────────────────────────────
     function openCategory(catId) {
         setActiveCategory(catId);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -39,16 +37,10 @@ export default function MenuGrid({ items, categories, sections }) {
 
         return (
             <div className="w-full flex flex-col items-center">
-                <CategoryBar
-                    sections={sections}
-                    activeSection={activeSection}
-                    onSelect={(secId) => { setActiveSection(secId); closeCategory(); }}
-                    isRtl={isRtl}
-                />
 
                 <main className="w-full max-w-[900px] px-8 pt-5 pb-[60px]">
                     {/* Back row */}
-                    <div className="flex items-center gap-3 mb-5">
+                    <div className="flex items-center gap-3 pb-10">
                         <button
                             onClick={closeCategory}
                             className="inline-flex items-center gap-1.5 text-[0.82rem] font-medium text-ink-700 bg-white border border-ink-100 rounded-full px-4 py-[7px] cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-colors hover:bg-ink-50"
@@ -103,11 +95,11 @@ export default function MenuGrid({ items, categories, sections }) {
                 isRtl={isRtl}
             />
 
-            <main className="w-full max-w-[900px] px-8 pt-5 pb-[60px]">
+            <main className="w-full max-w-[900px] px-8 pt-10 sm:pt-0 pb-[60px]">
                 {visibleSections.length === 0 ? (
                     <EmptyState />
                 ) : (
-                    <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-28 sm:gap-20">
                         {visibleSections.map((sec) => {
                             const sectionCats = categories.filter(
                                 (c) => c.sectionId === sec.id
@@ -116,18 +108,15 @@ export default function MenuGrid({ items, categories, sections }) {
 
                             return (
                                 <section key={sec.id}>
-                                    {/* Section header */}
-                                    <div
-                                        className="flex items-center gap-3 mb-3"
+                                    {/* Section header — large bold title */}
+                                    <h2
+                                        className="text-[2rem] sm:text-[2.4rem] font-extrabold text-ink-900 leading-[1.1] tracking-[-0.02em] pb-10 sm:p-12 text-center"
                                         dir={isRtl ? "rtl" : "ltr"}
                                     >
-                                        <h2 className="text-[0.7rem] font-semibold tracking-[0.12em] uppercase text-ink-400">
-                                            {sec.name}
-                                        </h2>
-                                        <div className="flex-1 h-px bg-ink-100" />
-                                    </div>
+                                        {sec.name}
+                                    </h2>
 
-                                    {/* Category cards under this section */}
+                                    {/* Category cards */}
                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                                         {sectionCats.map((cat, i) => (
                                             <CategoryCard

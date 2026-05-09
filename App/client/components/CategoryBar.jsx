@@ -7,7 +7,7 @@ export default function CategoryBar({ sections, activeSection, onSelect, isRtl =
 
     return (
         <div
-            className="sticky z-40 w-full border-b border-ink-100"
+            className="w-full"
             style={{
                 top: "88px",
                 background: "rgba(251,240,224,0.92)",
@@ -15,28 +15,40 @@ export default function CategoryBar({ sections, activeSection, onSelect, isRtl =
                 WebkitBackdropFilter: "blur(14px)",
             }}
         >
-            <div
-                className="flex items-center gap-2 px-5 py-3 overflow-x-auto hide-scrollbar max-w-[900px] mx-auto"
-                role="navigation"
-                aria-label="Section filter"
-                dir={isRtl ? "rtl" : "ltr"}
-            >
-                {/* "All" — always hardcoded */}
-                <Pill
-                    label={t("category.all")}
-                    isActive={activeSection === null}
-                    onClick={() => onSelect(null)}
-                />
+            {/* Outer: full width, scrollable on mobile */}
+            <div className="w-full overflow-x-auto hide-scrollbar">
+                {/* Inner: centered pills row */}
+                <div
+                    className="flex items-center gap-2 py-3 px-5 w-max mx-auto"
+                    role="navigation"
+                    aria-label="Section filter"
+                    dir={isRtl ? "rtl" : "ltr"}
+                    style={{ minWidth: "100%" }}
+                >
+                    {/* Spacer to help center when content fits */}
+                    <div className="flex-1 hidden sm:block" />
 
-                {/* One pill per section — dynamic from Strapi */}
-                {sections.map((sec) => (
-                    <Pill
-                        key={sec.id}
-                        label={sec.name}
-                        isActive={activeSection === sec.id}
-                        onClick={() => onSelect(sec.id)}
-                    />
-                ))}
+                    <div className="flex items-center gap-2">
+                        {/* "All" — always hardcoded */}
+                        <Pill
+                            label={t("category.all")}
+                            isActive={activeSection === null}
+                            onClick={() => onSelect(null)}
+                        />
+
+                        {/* One pill per section — dynamic from Strapi */}
+                        {sections.map((sec) => (
+                            <Pill
+                                key={sec.id}
+                                label={sec.name}
+                                isActive={activeSection === sec.id}
+                                onClick={() => onSelect(sec.id)}
+                            />
+                        ))}
+                    </div>
+
+                    <div className="flex-1 hidden sm:block" />
+                </div>
             </div>
         </div>
     );
