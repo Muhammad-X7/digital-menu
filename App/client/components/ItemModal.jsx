@@ -61,7 +61,7 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
                     "max-sm:[animation:sheetIn_0.30s_cubic-bezier(0.22,1,0.36,1)]",
                 ].join(" ")}
             >
-                {/* Image: left for LTR, right for RTL (handled by dir) */}
+                {/* Image */}
                 <div className="relative w-[45%] max-sm:w-full shrink-0 bg-brand-100 min-h-[340px] max-sm:min-h-[220px]">
                     {item.imageUrl ? (
                         <Image
@@ -89,16 +89,13 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
                     )}
 
                     {/* Name */}
-                    <h2
-                        className="text-[1.5rem] font-bold leading-[1.2] text-ink-900 mb-3"
-                        style={{ fontFamily: "var(--font-display)" }}
-                    >
+                    <h2 className="text-[1.5rem] font-bold leading-[1.2] text-ink-900 mb-3">
                         {item.name}
                     </h2>
 
                     {/* Description */}
                     {item.description && (
-                        <p className="text-[0.9rem] leading-[1.7] text-ink-600 mb-6 flex-1">
+                        <p className="text-[0.9rem] font-light leading-[1.7] text-ink-600 mb-6 flex-1">
                             {item.description}
                         </p>
                     )}
@@ -108,13 +105,13 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
                         <span className="text-[2rem] font-extrabold text-gold-600 tracking-[-0.02em] leading-none">
                             {formattedPrice}
                         </span>
-                        <span className="text-[0.75rem] font-medium text-ink-400 tracking-[0.06em] uppercase">
+                        <span className="text-[0.75rem] font-normal text-ink-400 tracking-[0.06em] uppercase">
                             {currency}
                         </span>
                     </div>
                 </div>
 
-                {/* Close button — always on the white content side */}
+                {/* Close button */}
                 <button
                     onClick={onClose}
                     aria-label={t("item.back")}

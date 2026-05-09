@@ -8,8 +8,8 @@ export default function TopNavBar() {
         <header className="w-full bg-transparent px-8 py-6 flex items-center justify-between">
             {/* Logo */}
             <Image
-                src="/logoss.png"
-                alt="/logoss.png"
+                src="/logo.png"
+                alt="/logo.png"
                 width={100}
                 height={100}
                 priority

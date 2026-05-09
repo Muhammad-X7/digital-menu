@@ -37,14 +37,11 @@ export default function CategoryCard({ category, onClick, index = 0, isRtl = fal
             </div>
 
             {/* Text: left side for LTR, right side for RTL */}
-            <div className={`absolute top-0 bottom-0 w-[55%] px-6 py-5 flex flex-col justify-end z-[2] ${isRtl ? "right-0 text-right" : "left-0 text-left"}`}>
-                <h2
-                    className="text-[1.15rem] font-bold text-ink-900 leading-[1.2]"
-                    style={{
-                        fontFamily: "var(--font-display)",
-                        marginBottom: category.description ? "4px" : 0,
-                    }}
-                >
+            <div
+                className={`absolute top-0 bottom-0 w-[55%] px-6 py-5 flex flex-col justify-end z-[2] ${isRtl ? "right-0 text-right" : "left-0 text-left"}`}
+                style={{ marginBottom: category.description ? "4px" : 0 }}
+            >
+                <h2 className="text-[1.15rem] font-bold text-ink-900 leading-[1.2] mb-1">
                     {category.name}
                 </h2>
                 {category.description && (

@@ -15,7 +15,6 @@ export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
             style={{
                 animationDelay: `${index * 50}ms`,
                 animationFillMode: "both",
-                fontFamily: "'Noto Sans Arabic', 'Segoe UI', sans-serif",
                 textAlign: isRtl ? "right" : "left",
             }}
         >
@@ -40,14 +39,11 @@ export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
                 </div>
 
                 <div className="px-3.5 pt-3 pb-3.5">
-                    <p
-                        className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.35] mb-1.5"
-                        style={{ fontFamily: "var(--font-display)" }}
-                    >
+                    <p className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.35] mb-1.5">
                         {item.name}
                     </p>
                     {item.description && (
-                        <p className="line-clamp-2 text-[0.78rem] text-ink-400 leading-[1.4] mb-2">
+                        <p className="line-clamp-2 text-[0.78rem] font-light text-ink-500 leading-[1.4] mb-2">
                             {item.description}
                         </p>
                     )}
@@ -55,7 +51,7 @@ export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
                         <span className="text-[0.95rem] font-bold text-gold-600">
                             {formattedPrice}
                         </span>
-                        <span className="text-[0.68rem] font-medium text-ink-400 tracking-[0.06em]">
+                        <span className="text-[0.68rem] font-normal text-ink-400 tracking-[0.06em]">
                             {currency}
                         </span>
                     </div>
@@ -83,14 +79,11 @@ export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
                 </div>
 
                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                    <p
-                        className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.3]"
-                        style={{ fontFamily: "var(--font-display)" }}
-                    >
+                    <p className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.3]">
                         {item.name}
                     </p>
                     {item.description && (
-                        <p className="text-[0.78rem] text-ink-400 leading-[1.4] whitespace-normal break-words">
+                        <p className="text-[0.78rem] font-light text-ink-500 leading-[1.4] whitespace-normal break-words">
                             {item.description}
                         </p>
                     )}
@@ -98,7 +91,7 @@ export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
                         <span className="text-[0.92rem] font-bold text-gold-600">
                             {formattedPrice}
                         </span>
-                        <span className="text-[0.65rem] font-medium text-ink-400 tracking-[0.06em]">
+                        <span className="text-[0.65rem] font-normal text-ink-400 tracking-[0.06em]">
                             {currency}
                         </span>
                     </div>

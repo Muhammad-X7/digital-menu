@@ -65,10 +65,7 @@ export default function MenuGrid({ items, categories }) {
                     </svg>
                     {t("item.back")}
                 </button>
-                <span
-                    className="text-[1.1rem] font-semibold text-ink-900"
-                    style={{ fontFamily: "var(--font-display)" }}
-                >
+                <span className="text-[1.1rem] font-semibold text-ink-900">
                     {activeCat?.name}
                 </span>
             </div>
@@ -109,7 +106,7 @@ function EmptyState() {
             <div className="w-16 h-16 rounded-full bg-ink-100 flex items-center justify-center text-[1.8rem] mb-4">
                 🍬
             </div>
-            <p className="text-[0.88rem] text-ink-400">
+            <p className="text-[0.88rem] font-light text-ink-400">
                 {t("item.unavailable")}
             </p>
         </div>

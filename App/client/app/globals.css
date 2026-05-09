@@ -4,8 +4,7 @@
 /* ─── Tailwind v4 Theme ─────────────────────────────────── */
 @theme {
   /* Font families */
-  --font-family-arabic: var(--font-noto-arabic), serif;
-  --font-family-latin: var(--font-playfair), serif;
+  --font-readex: "Readex Pro", sans-serif;
 
   /* Brand colors */
   --color-brand-50: #faf8f5;
@@ -85,16 +84,21 @@
   }
 }
 
-/* ─── Design Tokens (non-Tailwind: font stacks used in inline styles) ── */
+@font-face {
+  font-family: "Readex Pro";
+  src: url("/assets/Readex_Pro/ReadexPro-VariableFont_HEXP,wght.woff2") format("woff2");
+  font-weight: 160 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Design Tokens ─────────────────────────────────────── */
 :root {
-  --font-display: var(--font-playfair), "Noto Serif Arabic", Georgia, serif;
-  --font-body: var(--font-noto-arabic), var(--font-playfair), system-ui, sans-serif;
   /* --background: #f0ebe3; */
 
   --background: #fbf0e0;
 
   /* --background: #F5F0E8; */
-
 }
 
 /* ─── Reset & Base ──────────────────────────────────────── */
@@ -112,10 +116,9 @@ html {
 
 body {
   background-color: #fbf0e0;
-  /* --color-background */
   color: #111008;
-  /* --color-ink-900 */
-  font-family: var(--font-body);
+  font-family: var(--font-readex);
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
