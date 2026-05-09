@@ -1,19 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
+// ItemModal is only rendered when selectedItem !== null, so it always mounts
+// fresh. No memo needed at this level — the parent controls mounting.
 export default function ItemModal({ item, isRtl = false, onClose }) {
     const t = useTranslations();
 
-    const formattedPrice = isRtl
-        ? Number(item.price).toLocaleString("en-US").replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
-        : Number(item.price).toLocaleString("en-US");
+    // useMemo: price formatting runs on every render without it. Memoize so it
+    // only recomputes when item.price or isRtl changes (i.e. virtually never
+    // while the modal is open).
+    const formattedPrice = useMemo(
+        () =>
+            isRtl
+                ? Number(item.price).toLocaleString("en-US").replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d])
+                : Number(item.price).toLocaleString("en-US"),
+        [item.price, isRtl]
+    );
 
     const currency = isRtl ? "د.ع" : "IQD";
 
-    // Lock body scroll when open
+    // Lock body scroll when open. Cleanup correctly restores overflow.
     useEffect(() => {
         document.body.style.overflow = "hidden";
         return () => {
@@ -21,7 +30,9 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
         };
     }, []);
 
-    // Close on Escape
+    // Close on Escape. onClose is a stable useCallback reference from MenuGrid,
+    // so this effect only runs once on mount and once on unmount — no repeated
+    // listener registration/removal during the modal's lifetime.
     useEffect(() => {
         function onKey(e) {
             if (e.key === "Escape") onClose();
@@ -61,7 +72,7 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
                     "max-sm:[animation:sheetIn_0.30s_cubic-bezier(0.22,1,0.36,1)]",
                 ].join(" ")}
             >
-                {/* Image */}
+                {/* Image — priority because it's the focal point of the modal */}
                 <div className="relative w-[45%] max-sm:w-full shrink-0 bg-brand-100 min-h-[340px] max-sm:min-h-[220px]">
                     {item.imageUrl ? (
                         <Image
@@ -69,7 +80,7 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
                             alt={item.imageAlt || item.name}
                             fill
                             className="object-cover"
-                            sizes="340px"
+                            sizes="(max-width: 640px) 100vw, 340px"
                             priority
                         />
                     ) : (

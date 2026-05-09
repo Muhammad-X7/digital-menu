@@ -1,9 +1,22 @@
+import { memo, useMemo } from "react";
 import Image from "next/image";
 
-export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
-    const formattedPrice = isRtl
-        ? Number(item.price).toLocaleString("en-US").replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])
-        : Number(item.price).toLocaleString("en-US");
+// memo: MenuCard is a pure presentational component. In the items grid there
+// can be many cards; without memo, every card re-renders whenever MenuGrid
+// state changes (e.g. another card's modal opens/closes). With memo + stable
+// onClick from MenuGrid's useCallback, cards only re-render when their own
+// item/index/isRtl props change.
+const MenuCard = memo(function MenuCard({ item, index = 0, isRtl = false, onClick }) {
+    // useMemo: price formatting is a non-trivial string operation (locale
+    // number formatting + character map replacement). Memoizing means it only
+    // recomputes when item.price or isRtl actually changes.
+    const formattedPrice = useMemo(
+        () =>
+            isRtl
+                ? Number(item.price).toLocaleString("en-US").replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d])
+                : Number(item.price).toLocaleString("en-US"),
+        [item.price, isRtl]
+    );
 
     const currency = isRtl ? "د.ع" : "IQD";
 
@@ -99,4 +112,6 @@ export default function MenuCard({ item, index = 0, isRtl = false, onClick }) {
             </div>
         </button>
     );
-}
+});
+
+export default MenuCard;

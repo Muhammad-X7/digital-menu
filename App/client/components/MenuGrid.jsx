@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import dynamic from "next/dynamic";
 import CategoryBar from "./CategoryBar";
 import CategoryCard from "./CategoryCard";
 import MenuCard from "./MenuCard";
-import ItemModal from "./ItemModal";
+
+// Lazy-load ItemModal — it's heavy (Image, animations, scroll lock) and only
+// needed after a user interaction, so it should never be in the initial bundle.
+const ItemModal = dynamic(() => import("./ItemModal"), { ssr: false });
 
 export default function MenuGrid({ items, categories, sections }) {
     const [activeSection, setActiveSection] = useState(null);
@@ -15,20 +19,46 @@ export default function MenuGrid({ items, categories, sections }) {
     const locale = useLocale();
     const isRtl = locale === "ar" || locale === "ckb";
 
-    const visibleSections =
-        activeSection === null
-            ? sections
-            : sections.filter((s) => s.id === activeSection);
+    // Stable callback — avoids re-rendering CategoryBar's Pill buttons on every
+    // parent render cycle.
+    const handleSectionSelect = useCallback((id) => {
+        setActiveSection(id);
+    }, []);
 
-    function openCategory(catId) {
+    // Stable callback passed to CategoryCard onClick — without useCallback every
+    // CategoryCard would re-render whenever MenuGrid state changes.
+    const openCategory = useCallback((catId) => {
         setActiveCategory(catId);
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    }, []);
 
-    function closeCategory() {
+    const closeCategory = useCallback(() => {
         setActiveCategory(null);
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    }, []);
+
+    // Stable callback passed to MenuCard — prevents all visible cards from
+    // re-rendering when selectedItem changes (e.g. modal closes).
+    const handleItemClick = useCallback((item) => {
+        setSelectedItem(item);
+    }, []);
+
+    // Stable callback for modal close — ItemModal's useEffect has onClose in
+    // its dep array, so instability here would re-register the keydown listener
+    // on every render.
+    const handleModalClose = useCallback(() => {
+        setSelectedItem(null);
+    }, []);
+
+    // Memoize the filtered sections list so CategoryBar and section map don't
+    // recompute on unrelated state changes (e.g. selectedItem open/close).
+    const visibleSections = useMemo(
+        () =>
+            activeSection === null
+                ? sections
+                : sections.filter((s) => s.id === activeSection),
+        [sections, activeSection]
+    );
 
     // ── Item drill-down view ─────────────────────────────────────────────────
     if (activeCategory !== null) {
@@ -67,7 +97,7 @@ export default function MenuGrid({ items, categories, sections }) {
                                     item={item}
                                     index={i}
                                     isRtl={isRtl}
-                                    onClick={setSelectedItem}
+                                    onClick={handleItemClick}
                                 />
                             ))}
                         </div>
@@ -78,7 +108,7 @@ export default function MenuGrid({ items, categories, sections }) {
                     <ItemModal
                         item={selectedItem}
                         isRtl={isRtl}
-                        onClose={() => setSelectedItem(null)}
+                        onClose={handleModalClose}
                     />
                 )}
             </div>
@@ -91,7 +121,7 @@ export default function MenuGrid({ items, categories, sections }) {
             <CategoryBar
                 sections={sections}
                 activeSection={activeSection}
-                onSelect={setActiveSection}
+                onSelect={handleSectionSelect}
                 isRtl={isRtl}
             />
 
@@ -139,7 +169,7 @@ export default function MenuGrid({ items, categories, sections }) {
                 <ItemModal
                     item={selectedItem}
                     isRtl={isRtl}
-                    onClose={() => setSelectedItem(null)}
+                    onClose={handleModalClose}
                 />
             )}
         </div>

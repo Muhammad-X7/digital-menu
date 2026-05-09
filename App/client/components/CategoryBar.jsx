@@ -1,8 +1,14 @@
 "use client";
 
+import { memo } from "react";
 import { useTranslations } from "next-intl";
 
-export default function CategoryBar({ sections, activeSection, onSelect, isRtl = false }) {
+// memo: CategoryBar receives sections (stable array reference from server),
+// activeSection (changes on pill click), onSelect (now stable useCallback from
+// MenuGrid), and isRtl (stable). Without memo, it re-renders on every MenuGrid
+// state change. With memo it only re-renders when activeSection changes — which
+// is exactly when it needs to, to update the active pill highlight.
+const CategoryBar = memo(function CategoryBar({ sections, activeSection, onSelect, isRtl = false }) {
     const t = useTranslations();
 
     return (
@@ -52,9 +58,14 @@ export default function CategoryBar({ sections, activeSection, onSelect, isRtl =
             </div>
         </div>
     );
-}
+});
 
-function Pill({ label, isActive, onClick }) {
+export default CategoryBar;
+
+// Pill is a module-level component (not defined inside CategoryBar), so React
+// never treats it as a new component type between renders. memo here prevents
+// inactive pills from re-rendering when only the active pill changes.
+const Pill = memo(function Pill({ label, isActive, onClick }) {
     return (
         <button
             onClick={onClick}
@@ -69,4 +80,4 @@ function Pill({ label, isActive, onClick }) {
             {label}
         </button>
     );
-}
+});

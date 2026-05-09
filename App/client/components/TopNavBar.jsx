@@ -14,8 +14,8 @@ export default function TopNavBar() {
                 <Image
                     src="/logo.png"
                     alt="Jiggly Cake"
-                    width={110}
-                    height={110}
+                    width={125}
+                    height={125}
                     priority
                     className="object-contain"
                 />
@@ -23,7 +23,7 @@ export default function TopNavBar() {
             </div>
 
             {/* Tagline */}
-            <p className="text-base font-normal text-ink-600 tracking-[0.01em] text-center leading-normal">
+            <p className="text-lg font-normal text-ink-800 tracking-[0.01em] text-center leading-normal">
                 {t("tagline")}
             </p>
         </header>

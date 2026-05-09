@@ -1,6 +1,11 @@
+import { memo } from "react";
 import Image from "next/image";
 
-export default function CategoryCard({ category, onClick, index = 0, isRtl = false }) {
+// memo: CategoryCard is pure presentational. On the home screen there may be
+// many category cards rendered in a grid. Without memo, every card re-renders
+// whenever MenuGrid's activeSection state changes (e.g. user clicks a section
+// pill). With memo, a card only re-renders when its own props change.
+const CategoryCard = memo(function CategoryCard({ category, onClick, index = 0, isRtl = false }) {
     const isFirst = index === 0;
 
     return (
@@ -55,4 +60,6 @@ export default function CategoryCard({ category, onClick, index = 0, isRtl = fal
             </div>
         </button>
     );
-}
+});
+
+export default CategoryCard;

@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { locales } from "../i18n";
 
 const LABELS = {
@@ -19,15 +19,25 @@ export default function LanguageSwitcher() {
     const ref = useRef(null);
     const isRtl = locale === "ar" || locale === "ckb";
 
-    function switchLocale(newLocale) {
-        if (newLocale === locale) { setOpen(false); return; }
-        const segments = pathname.split("/");
-        segments[1] = newLocale;
-        router.push(segments.join("/"));
-        setOpen(false);
-    }
+    // useCallback: switchLocale is recreated on every render without this.
+    // While LanguageSwitcher isn't memo'd (it owns its own state and isn't a
+    // frequent re-render target), stabilizing it is still correct practice and
+    // ensures the function identity is safe if the component is ever memo'd in
+    // the future. The dep array is correct: locale and pathname are the only
+    // values read inside the function.
+    const switchLocale = useCallback(
+        (newLocale) => {
+            if (newLocale === locale) { setOpen(false); return; }
+            const segments = pathname.split("/");
+            segments[1] = newLocale;
+            router.push(segments.join("/"));
+            setOpen(false);
+        },
+        [locale, pathname, router]
+    );
 
-    // Close on outside click
+    // Close on outside click — the handler is defined inside useEffect so it
+    // is already scoped correctly; no useCallback needed here.
     useEffect(() => {
         function handle(e) {
             if (ref.current && !ref.current.contains(e.target)) setOpen(false);
