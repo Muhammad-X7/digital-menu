@@ -23,7 +23,7 @@ export default function TopNavBar() {
             </div>
 
             {/* Tagline */}
-            <p className="text-lg font-normal text-ink-800 tracking-[0.01em] text-center leading-normal">
+            <p className="text-xl font-normal text-ink-800 tracking-[0.01em] text-center leading-normal">
                 {t("tagline")}
             </p>
         </header>
