@@ -1,4 +1,4 @@
-import { getCategories, getMenuItems } from "../../lib/strapi";
+import { getCategories, getMenuItems, getSections } from "../../lib/strapi";
 import TopNavBar from "../../components/TopNavBar";
 import MenuGrid from "../../components/MenuGrid";
 
@@ -9,9 +9,11 @@ export default async function MenuPage({ params }) {
 
     let categories = [];
     let items = [];
+    let sections = [];
 
     try {
-        [categories, items] = await Promise.all([
+        [sections, categories, items] = await Promise.all([
+            getSections(locale),
             getCategories(locale),
             getMenuItems(locale),
         ]);
@@ -22,7 +24,7 @@ export default async function MenuPage({ params }) {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <TopNavBar />
-            <MenuGrid items={items} categories={categories} />
+            <MenuGrid items={items} categories={categories} sections={sections} />
         </div>
     );
 }

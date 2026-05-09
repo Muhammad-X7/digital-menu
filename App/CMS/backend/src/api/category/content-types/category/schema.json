@@ -5,7 +5,7 @@
     "singularName": "category",
     "pluralName": "categories",
     "displayName": "Category",
-    "description": "Menu categories (e.g. Sweets, Grills, Drinks)"
+    "description": "Menu categories grouped under sections"
   },
   "options": {
     "draftAndPublish": false
@@ -59,6 +59,17 @@
       "type": "integer",
       "required": false,
       "default": 0,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "section": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::section.section",
+      "inversedBy": "categories",
       "pluginOptions": {
         "i18n": {
           "localized": false

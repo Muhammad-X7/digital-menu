@@ -24,7 +24,29 @@ async function fetchStrapi(path, params = {}) {
 }
 
 /**
- * Fetches all categories for a given locale.
+ * Fetches all sections for a given locale, ordered by `order` asc.
+ */
+export async function getSections(locale) {
+  const data = await fetchStrapi("/sections", {
+    locale,
+    "pagination[pageSize]": 100,
+    "fields[0]": "name",
+    "fields[1]": "order",
+    "sort": "order:asc",
+  });
+
+  return (data.data || []).map((item) => {
+    const attrs = item.attributes ?? item;
+    return {
+      id: item.id,
+      name: attrs.name ?? item.name,
+      order: attrs.order ?? 0,
+    };
+  });
+}
+
+/**
+ * Fetches all categories for a given locale, including their section relation.
  */
 export async function getCategories(locale) {
   const data = await fetchStrapi("/categories", {
@@ -34,7 +56,8 @@ export async function getCategories(locale) {
     "fields[1]": "slug",
     "fields[2]": "description",
     "populate[0]": "image",
-    "sort": "order:asc",           // ← added
+    "populate[1]": "section",
+    "sort": "order:asc",
   });
 
   return (data.data || []).map((item) => {
@@ -48,12 +71,17 @@ export async function getCategories(locale) {
         : `${STRAPI_URL}${imageAttrs.url}`
       : null;
 
+    const sectionData = attrs.section?.data ?? attrs.section;
+    const sectionAttrs = sectionData?.attributes ?? sectionData;
+
     return {
       id: item.id,
       name: attrs.name ?? item.name,
       slug: attrs.slug ?? item.slug,
       description: attrs.description ?? null,
       imageUrl,
+      sectionId: sectionData?.id ?? null,
+      sectionName: sectionAttrs?.name ?? null,
     };
   });
 }
@@ -69,7 +97,7 @@ export async function getMenuItems(locale) {
     "populate[0]": "image",
     "populate[1]": "category",
     "pagination[pageSize]": 200,
-    "sort": "order:asc",           // ← added
+    "sort": "order:asc",
   });
 
   return (data.data || []).map(normalizeMenuItem);
@@ -77,8 +105,6 @@ export async function getMenuItems(locale) {
 
 /**
  * Fetches a single menu item by documentId for a given locale.
- * Strapi v5 uses documentId (string) for single-resource lookups,
- * not the numeric id used in list responses.
  */
 export async function getMenuItem(id, locale) {
   const data = await fetchStrapi(`/menu-items/${id}`, {
