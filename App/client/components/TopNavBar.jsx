@@ -14,8 +14,8 @@ export default function TopNavBar() {
                 <Image
                     src="/logo.png"
                     alt="Jiggly Cake"
-                    width={100}
-                    height={100}
+                    width={110}
+                    height={110}
                     priority
                     className="object-contain"
                 />
