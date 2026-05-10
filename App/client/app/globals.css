@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
 @import "tailwindcss";
 
 /* ─── Tailwind v4 Theme ─────────────────────────────────── */
 @theme {
   /* Font families */
-  --font-readex: "Readex Pro", sans-serif;
+  --font-vazir: "Vazirmatn", sans-serif;
 
   /* Brand colors */
   --color-brand-50: #faf8f5;
@@ -85,9 +84,9 @@
 }
 
 @font-face {
-  font-family: "Readex Pro";
-  src: url("/assets/Readex_Pro/ReadexPro-VariableFont_HEXP,wght.woff2") format("woff2");
-  font-weight: 160 700;
+  font-family: "Vazirmatn";
+  src: url("/assets/Vazirmatn/Vazirmatn-VariableFont_wght.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -117,11 +116,11 @@ html {
 body {
   background-color: #fbf0e0;
   color: #111008;
-  font-family: var(--font-readex);
+  font-family: var(--font-vazir);
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────── */

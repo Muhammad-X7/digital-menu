@@ -1,24 +1,26 @@
-Readex Pro Variable Font
-========================
+Vazirmatn Variable Font
+=======================
 
-This download contains Readex Pro as both a variable font and static fonts.
+This download contains Vazirmatn as both a variable font and static fonts.
 
-Readex Pro is a variable font with these axes:
-  HEXP
+Vazirmatn is a variable font with this axis:
   wght
 
 This means all the styles are contained in a single file:
-  ReadexPro-VariableFont_HEXP,wght.ttf
+  Vazirmatn-VariableFont_wght.ttf
 
 If your app fully supports variable fonts, you can now pick intermediate styles
 that aren’t available as static fonts. Not all apps support variable fonts, and
-in those cases you can use the static font files for Readex Pro:
-  static/ReadexPro-ExtraLight.ttf
-  static/ReadexPro-Light.ttf
-  static/ReadexPro-Regular.ttf
-  static/ReadexPro-Medium.ttf
-  static/ReadexPro-SemiBold.ttf
-  static/ReadexPro-Bold.ttf
+in those cases you can use the static font files for Vazirmatn:
+  static/Vazirmatn-Thin.ttf
+  static/Vazirmatn-ExtraLight.ttf
+  static/Vazirmatn-Light.ttf
+  static/Vazirmatn-Regular.ttf
+  static/Vazirmatn-Medium.ttf
+  static/Vazirmatn-SemiBold.ttf
+  static/Vazirmatn-Bold.ttf
+  static/Vazirmatn-ExtraBold.ttf
+  static/Vazirmatn-Black.ttf
 
 Get started
 -----------
