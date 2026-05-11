@@ -1,15 +1,16 @@
 "use client";
 
 import { memo } from "react";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
-// memo: CategoryBar receives sections (stable array reference from server),
-// activeSection (changes on pill click), onSelect (now stable useCallback from
-// MenuGrid), and isRtl (stable). Without memo, it re-renders on every MenuGrid
-// state change. With memo it only re-renders when activeSection changes — which
-// is exactly when it needs to, to update the active pill highlight.
-const CategoryBar = memo(function CategoryBar({ sections, activeSection, onSelect, isRtl = false }) {
+// Pills link to /?section=<documentId> (stable across locales) instead of
+// /?section=<id> (locale-specific numeric id). This ensures that switching
+// language keeps the same section selected — e.g. "Japanese Cake" is section
+// documentId "xyz" in both EN and CKB, even though its numeric id differs.
+const CategoryBar = memo(function CategoryBar({ sections, activeSection, isRtl = false }) {
     const t = useTranslations();
+    const locale = useLocale();
 
     return (
         <div
@@ -31,24 +32,23 @@ const CategoryBar = memo(function CategoryBar({ sections, activeSection, onSelec
                     dir={isRtl ? "rtl" : "ltr"}
                     style={{ minWidth: "100%" }}
                 >
-                    {/* Spacer to help center when content fits */}
                     <div className="flex-1 hidden sm:block" />
 
                     <div className="flex items-center gap-2">
-                        {/* "All" — always hardcoded */}
+                        {/* "All" pill — clears section filter */}
                         <Pill
                             label={t("category.all")}
                             isActive={activeSection === null}
-                            onClick={() => onSelect(null)}
+                            href={`/${locale}`}
                         />
 
-                        {/* One pill per section — dynamic from Strapi */}
+                        {/* One pill per section — uses documentId for locale-stable URLs */}
                         {sections.map((sec) => (
                             <Pill
                                 key={sec.id}
                                 label={sec.name}
-                                isActive={activeSection === sec.id}
-                                onClick={() => onSelect(sec.id)}
+                                isActive={activeSection === sec.documentId}
+                                href={`/${locale}?section=${sec.documentId}`}
                             />
                         ))}
                     </div>
@@ -62,22 +62,19 @@ const CategoryBar = memo(function CategoryBar({ sections, activeSection, onSelec
 
 export default CategoryBar;
 
-// Pill is a module-level component (not defined inside CategoryBar), so React
-// never treats it as a new component type between renders. memo here prevents
-// inactive pills from re-rendering when only the active pill changes.
-const Pill = memo(function Pill({ label, isActive, onClick }) {
+const Pill = memo(function Pill({ label, isActive, href }) {
     return (
-        <button
-            onClick={onClick}
+        <Link
+            href={href}
             aria-pressed={isActive}
             className={[
-                "flex-shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-[0.82rem] font-medium tracking-[0.015em] cursor-pointer border-none transition-all duration-[200ms] ease-in-out",
+                "flex-shrink-0 whitespace-nowrap px-4 py-2.5 rounded-full text-[0.82rem] font-medium tracking-[0.015em] cursor-pointer border-none transition-all duration-[200ms] ease-in-out",
                 isActive
                     ? "bg-ink-900 text-white shadow-[0_2px_8px_rgba(17,16,8,0.18)]"
                     : "bg-white/70 text-ink-700 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:bg-white hover:text-ink-900 outline outline-1 -outline-offset-1 outline-ink-200",
             ].join(" ")}
         >
             {label}
-        </button>
+        </Link>
     );
 });

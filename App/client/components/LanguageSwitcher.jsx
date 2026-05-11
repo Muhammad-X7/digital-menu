@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { locales } from "../i18n";
 
@@ -15,25 +15,27 @@ export default function LanguageSwitcher() {
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
     const isRtl = locale === "ar" || locale === "ckb";
 
     // useCallback: switchLocale is recreated on every render without this.
-    // While LanguageSwitcher isn't memo'd (it owns its own state and isn't a
-    // frequent re-render target), stabilizing it is still correct practice and
-    // ensures the function identity is safe if the component is ever memo'd in
-    // the future. The dep array is correct: locale and pathname are the only
-    // values read inside the function.
+    // searchParams is included in the dep array so the query string (e.g.
+    // ?section=xyz) is always current when the function runs.
     const switchLocale = useCallback(
         (newLocale) => {
             if (newLocale === locale) { setOpen(false); return; }
             const segments = pathname.split("/");
             segments[1] = newLocale;
-            router.push(segments.join("/"));
+            const newPath = segments.join("/");
+            // Preserve any existing query params (e.g. ?section=documentId)
+            // so the active section filter survives a locale switch.
+            const qs = searchParams.toString();
+            router.push(qs ? `${newPath}?${qs}` : newPath);
             setOpen(false);
         },
-        [locale, pathname, router]
+        [locale, pathname, router, searchParams]
     );
 
     // Close on outside click — the handler is defined inside useEffect so it

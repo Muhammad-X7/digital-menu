@@ -120,7 +120,18 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.8;
+  line-height: 1.6;
+}
+
+/* ─── Button & link text alignment ──────────────────────── */
+/* Vazirmatn has tall ascender metrics that push text upward inside
+   fixed-height pills and buttons. Setting line-height: 1 and aligning
+   to middle keeps the text visually centered next to icons. */
+button,
+a {
+  font-family: var(--font-vazir);
+  line-height: 1;
+  vertical-align: middle;
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────── */

@@ -1,127 +1,37 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import CategoryBar from "./CategoryBar";
 import CategoryCard from "./CategoryCard";
-import MenuCard from "./MenuCard";
 
-// Lazy-load ItemModal — it's heavy (Image, animations, scroll lock) and only
-// needed after a user interaction, so it should never be in the initial bundle.
-const ItemModal = dynamic(() => import("./ItemModal"), { ssr: false });
-
-export default function MenuGrid({ items, categories, sections }) {
-    const [activeSection, setActiveSection] = useState(null);
-    const [activeCategory, setActiveCategory] = useState(null);
-    const [selectedItem, setSelectedItem] = useState(null);
+export default function MenuGrid({ categories, sections }) {
     const t = useTranslations();
     const locale = useLocale();
     const isRtl = locale === "ar" || locale === "ckb";
+    const searchParams = useSearchParams();
 
-    // Stable callback — avoids re-rendering CategoryBar's Pill buttons on every
-    // parent render cycle.
-    const handleSectionSelect = useCallback((id) => {
-        setActiveSection(id);
-    }, []);
+    // activeSection is now a documentId string (e.g. "abc123xyz") or null.
+    // Previously it was a Number() — that broke cross-locale section filtering
+    // because numeric ids differ per locale. documentId is stable across all locales.
+    const activeSection = searchParams.get("section") ?? null;
 
-    // Stable callback passed to CategoryCard onClick — without useCallback every
-    // CategoryCard would re-render whenever MenuGrid state changes.
-    const openCategory = useCallback((catId) => {
-        setActiveCategory(catId);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, []);
-
-    const closeCategory = useCallback(() => {
-        setActiveCategory(null);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, []);
-
-    // Stable callback passed to MenuCard — prevents all visible cards from
-    // re-rendering when selectedItem changes (e.g. modal closes).
-    const handleItemClick = useCallback((item) => {
-        setSelectedItem(item);
-    }, []);
-
-    // Stable callback for modal close — ItemModal's useEffect has onClose in
-    // its dep array, so instability here would re-register the keydown listener
-    // on every render.
-    const handleModalClose = useCallback(() => {
-        setSelectedItem(null);
-    }, []);
-
-    // Memoize the filtered sections list so CategoryBar and section map don't
-    // recompute on unrelated state changes (e.g. selectedItem open/close).
+    // Filter visible sections by documentId match — only recomputes when
+    // sections array or URL param changes.
     const visibleSections = useMemo(
         () =>
             activeSection === null
                 ? sections
-                : sections.filter((s) => s.id === activeSection),
+                : sections.filter((s) => s.documentId === activeSection),
         [sections, activeSection]
     );
 
-    // ── Item drill-down view ─────────────────────────────────────────────────
-    if (activeCategory !== null) {
-        const cat = categories.find((c) => c.id === activeCategory);
-        const filtered = items.filter((i) => i.categoryId === activeCategory);
-
-        return (
-            <div className="w-full flex flex-col items-center">
-
-                <main className="w-full max-w-[900px] px-8 pt-5 pb-[60px]">
-                    {/* Back row */}
-                    <div className="flex items-center gap-3 pb-10">
-                        <button
-                            onClick={closeCategory}
-                            className="inline-flex items-center gap-1.5 text-[0.82rem] font-medium text-ink-700 bg-white border border-ink-100 rounded-full px-4 py-[7px] cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-colors hover:bg-ink-50"
-                        >
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                className={`shrink-0 ${isRtl ? "rotate-180" : ""}`}>
-                                <path d="M11.5 7H2.5M2.5 7L6 3.5M2.5 7L6 10.5"
-                                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            {t("item.back")}
-                        </button>
-                        <span className="text-[1.1rem] font-semibold text-ink-900">
-                            {cat?.name}
-                        </span>
-                    </div>
-
-                    {filtered.length === 0 ? (
-                        <EmptyState />
-                    ) : (
-                        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4">
-                            {filtered.map((item, i) => (
-                                <MenuCard
-                                    key={item.id}
-                                    item={item}
-                                    index={i}
-                                    isRtl={isRtl}
-                                    onClick={handleItemClick}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </main>
-
-                {selectedItem && (
-                    <ItemModal
-                        item={selectedItem}
-                        isRtl={isRtl}
-                        onClose={handleModalClose}
-                    />
-                )}
-            </div>
-        );
-    }
-
-    // ── Categories view (All or filtered by section) ─────────────────────────
     return (
         <div className="w-full flex flex-col items-center">
             <CategoryBar
                 sections={sections}
                 activeSection={activeSection}
-                onSelect={handleSectionSelect}
                 isRtl={isRtl}
             />
 
@@ -138,7 +48,6 @@ export default function MenuGrid({ items, categories, sections }) {
 
                             return (
                                 <section key={sec.id}>
-                                    {/* Section header — large bold title */}
                                     <h2
                                         className="text-[2rem] sm:text-[2.4rem] font-extrabold text-ink-900 leading-[1.1] tracking-[-0.02em] pb-10 sm:p-12 text-center"
                                         dir={isRtl ? "rtl" : "ltr"}
@@ -146,15 +55,14 @@ export default function MenuGrid({ items, categories, sections }) {
                                         {sec.name}
                                     </h2>
 
-                                    {/* Category cards */}
                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                                         {sectionCats.map((cat, i) => (
                                             <CategoryCard
                                                 key={cat.id}
                                                 category={cat}
+                                                locale={locale}
                                                 index={i}
                                                 isRtl={isRtl}
-                                                onClick={() => openCategory(cat.id)}
                                             />
                                         ))}
                                     </div>
@@ -164,14 +72,6 @@ export default function MenuGrid({ items, categories, sections }) {
                     </div>
                 )}
             </main>
-
-            {selectedItem && (
-                <ItemModal
-                    item={selectedItem}
-                    isRtl={isRtl}
-                    onClose={handleModalClose}
-                />
-            )}
         </div>
     );
 }

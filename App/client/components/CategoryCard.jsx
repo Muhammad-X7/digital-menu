@@ -1,17 +1,19 @@
 import { memo } from "react";
+import Link from "next/link";
 import Image from "next/image";
 
-// memo: CategoryCard is pure presentational. On the home screen there may be
-// many category cards rendered in a grid. Without memo, every card re-renders
-// whenever MenuGrid's activeSection state changes (e.g. user clicks a section
-// pill). With memo, a card only re-renders when its own props change.
-const CategoryCard = memo(function CategoryCard({ category, onClick, index = 0, isRtl = false }) {
+// CategoryCard links to /[locale]/category/[documentId].
+// documentId is stable across all locales (e.g. "abc123xyz"), unlike the
+// numeric id which is locale-specific in Strapi i18n (same category can be
+// id:10 in ckb and id:4 in en). Using documentId makes the URL locale-agnostic
+// so switching language keeps the user on the correct category page.
+const CategoryCard = memo(function CategoryCard({ category, locale, index = 0, isRtl = false }) {
     const isFirst = index === 0;
 
     return (
-        <button
-            onClick={onClick}
-            className="card-lift animate-fade-up relative w-full h-[230px] rounded-[var(--radius-xl)] overflow-hidden bg-brand-100 border-none cursor-pointer text-left p-0 opacity-0 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-[transform,box-shadow] duration-[220ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(60,40,10,0.12)]"
+        <Link
+            href={`/${locale}/category/${category.documentId}`}
+            className="card-lift animate-fade-up relative w-full h-[230px] rounded-[var(--radius-xl)] overflow-hidden bg-brand-100 border-none cursor-pointer text-left p-0 opacity-0 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-[transform,box-shadow] duration-[220ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(60,40,10,0.12)] block"
             style={{
                 animationDelay: `${index * 60}ms`,
                 animationFillMode: "both",
@@ -58,7 +60,7 @@ const CategoryCard = memo(function CategoryCard({ category, onClick, index = 0, 
                     </p>
                 )}
             </div>
-        </button>
+        </Link>
     );
 });
 

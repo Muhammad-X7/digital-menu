@@ -25,6 +25,7 @@ async function fetchStrapi(path, params = {}) {
 
 /**
  * Fetches all sections for a given locale, ordered by `order` asc.
+ * Returns documentId (stable across locales) alongside the numeric id.
  */
 export async function getSections(locale) {
   const data = await fetchStrapi("/sections", {
@@ -39,6 +40,9 @@ export async function getSections(locale) {
     const attrs = item.attributes ?? item;
     return {
       id: item.id,
+      // documentId is stable across all locales for the same section.
+      // Used in ?section= query param so the filter works regardless of locale.
+      documentId: item.documentId ?? String(item.id),
       name: attrs.name ?? item.name,
       order: attrs.order ?? 0,
     };
@@ -47,6 +51,7 @@ export async function getSections(locale) {
 
 /**
  * Fetches all categories for a given locale, including their section relation.
+ * Returns documentId (stable across locales) alongside the numeric id.
  */
 export async function getCategories(locale) {
   const data = await fetchStrapi("/categories", {
@@ -76,6 +81,10 @@ export async function getCategories(locale) {
 
     return {
       id: item.id,
+      // documentId is stable across all locales for the same category.
+      // Used in /category/[documentId] URLs so switching locale keeps the
+      // correct category regardless of locale-specific numeric ids.
+      documentId: item.documentId ?? attrs.slug ?? String(item.id),
       name: attrs.name ?? item.name,
       slug: attrs.slug ?? item.slug,
       description: attrs.description ?? null,
