@@ -2,11 +2,6 @@ import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-// CategoryCard links to /[locale]/category/[documentId].
-// documentId is stable across all locales (e.g. "abc123xyz"), unlike the
-// numeric id which is locale-specific in Strapi i18n (same category can be
-// id:10 in ckb and id:4 in en). Using documentId makes the URL locale-agnostic
-// so switching language keeps the user on the correct category page.
 const CategoryCard = memo(function CategoryCard({ category, locale, index = 0, isRtl = false }) {
     const isFirst = index === 0;
 
@@ -54,11 +49,6 @@ const CategoryCard = memo(function CategoryCard({ category, locale, index = 0, i
                 <h2 className="text-[1.15rem] font-bold text-ink-900 leading-[1.2] mb-1">
                     {category.name}
                 </h2>
-                {category.description && (
-                    <p className="text-[0.78rem] text-ink-500 leading-[1.4] font-normal m-0">
-                        {category.description}
-                    </p>
-                )}
             </div>
         </Link>
     );
