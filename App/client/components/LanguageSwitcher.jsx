@@ -1,5 +1,18 @@
 "use client";
 
+// components/LanguageSwitcher.jsx
+// Client Component — owns dropdown open/close state and locale routing.
+//
+// Client-side responsibilities:
+//   1. open state — whether the dropdown is visible
+//   2. switchLocale — replaces the locale segment in the URL path while
+//      preserving any existing query params (e.g. ?section=documentId)
+//   3. Outside-click handler via useEffect + ref
+//
+// useCallback on switchLocale: the function closes over locale, pathname,
+// router, and searchParams. Without useCallback it would be recreated on
+// every render, which — while not breaking anything — makes the dep arrays
+// of any downstream hooks that reference it less stable.
 import { useLocale } from "next-intl";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -20,9 +33,6 @@ export default function LanguageSwitcher() {
     const ref = useRef(null);
     const isRtl = locale === "ar" || locale === "ckb";
 
-    // useCallback: switchLocale is recreated on every render without this.
-    // searchParams is included in the dep array so the query string (e.g.
-    // ?section=xyz) is always current when the function runs.
     const switchLocale = useCallback(
         (newLocale) => {
             if (newLocale === locale) { setOpen(false); return; }
@@ -38,8 +48,7 @@ export default function LanguageSwitcher() {
         [locale, pathname, router, searchParams]
     );
 
-    // Close on outside click — the handler is defined inside useEffect so it
-    // is already scoped correctly; no useCallback needed here.
+    // Close on outside click.
     useEffect(() => {
         function handle(e) {
             if (ref.current && !ref.current.contains(e.target)) setOpen(false);

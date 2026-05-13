@@ -1,22 +1,35 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import { useTranslations, useLocale } from "next-intl";
+// components/CategoryItemsGrid.jsx
+// Client Component — owns ItemModal open/close state only.
+//
+// Data arrives as plain serialisable props from the CategoryPage Server
+// Component — no fetching happens here. The client-side responsibilities are:
+//   1. selectedItem state — which item's modal is open (null = closed)
+//   2. handleItemClick / handleModalClose — stable callbacks via useCallback
+//   3. Lazy-loading ItemModal via next/dynamic — the modal JS is excluded from
+//      the initial bundle and only downloaded after the first card tap
+//
+// MenuCard is a "use client" component (it has an onClick prop). It is
+// memoized so that changing selectedItem (e.g. opening/closing a modal) does
+// NOT re-render every card — only the modal itself re-renders.
+import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import MenuCard from "./MenuCard";
 
 // Lazy-load ItemModal — only needed after a tap, never in the initial bundle.
+// ssr: false because the modal uses document.body and window (browser APIs).
 const ItemModal = dynamic(() => import("./ItemModal"), { ssr: false });
 
-// CategoryItemsGrid is the full items view for a single category.
-// It lives at /[locale]/category/[categoryId] and receives its data from the
-// server page component, keeping this component purely presentational + modal state.
 export default function CategoryItemsGrid({ items, categoryName, locale }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const t = useTranslations();
     const isRtl = locale === "ar" || locale === "ckb";
 
+    // useCallback: stable reference prevents MenuCard re-renders caused by
+    // a new function identity on every CategoryItemsGrid render.
     const handleItemClick = useCallback((item) => {
         setSelectedItem(item);
     }, []);
@@ -63,6 +76,7 @@ export default function CategoryItemsGrid({ items, categoryName, locale }) {
                 )}
             </main>
 
+            {/* ItemModal only mounts when an item is selected */}
             {selectedItem && (
                 <ItemModal
                     item={selectedItem}

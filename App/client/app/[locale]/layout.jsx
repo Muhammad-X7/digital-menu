@@ -1,3 +1,8 @@
+// app/[locale]/layout.jsx
+// Server Component — no "use client".
+// Provides locale context to the entire subtree via NextIntlClientProvider.
+// Switching to a new locale re-renders only this layout and its children on
+// the server; the client bundle stays lean.
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -29,6 +34,7 @@ export const metadata = {
     },
 };
 
+// Pre-generate all locale routes at build time.
 export function generateStaticParams() {
     return locales.map((locale) => ({ locale }));
 }
@@ -38,6 +44,10 @@ export default async function LocaleLayout({ children, params }) {
 
     if (!locales.includes(locale)) notFound();
 
+    // getMessages() reads from the messages/<locale>.json file on the server.
+    // Passing the messages object to NextIntlClientProvider is required so
+    // that "use client" components (LanguageSwitcher, CategoryItemsGrid, etc.)
+    // can call useTranslations() without a separate network request.
     const messages = await getMessages();
     const isRtl = locale === "ar" || locale === "ckb";
 

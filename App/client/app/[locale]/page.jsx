@@ -1,17 +1,16 @@
+// app/[locale]/page.jsx
+// Server Component — no "use client".
+//
+// All data fetching happens here so MenuGrid and TopNavBar receive
+// pre-fetched props rather than triggering their own Strapi calls.
+// The page is statically generated at build time and revalidated
+// on-demand via revalidateTag("menu") from the /api/revalidate webhook.
 import { getCategories, getSections } from "../../lib/strapi";
 import TopNavBar from "../../components/TopNavBar";
 import MenuGrid from "../../components/MenuGrid";
 
-// force-static: Next.js builds this page once at deploy time and serves it as
-// a pure static file. No server computation per request — as fast as a CDN can
-// physically deliver a file. The cache is only invalidated when Strapi fires
-// the webhook at /api/revalidate, which calls revalidateTag("menu").
-export const dynamic = "force-static";
-
-export default async function MenuPage({ params, searchParams }) {
+export default async function MenuPage({ params }) {
     const { locale } = await params;
-    const { section } = await searchParams;
-    const activeSection = section ?? null;
 
     let categories = [];
     let sections = [];
@@ -23,6 +22,7 @@ export default async function MenuPage({ params, searchParams }) {
         ]);
     } catch (err) {
         console.error("Failed to fetch menu data:", err);
+        // Render empty state rather than crash — MenuGrid handles empty arrays.
     }
 
     return (
@@ -31,7 +31,7 @@ export default async function MenuPage({ params, searchParams }) {
             <MenuGrid
                 categories={categories}
                 sections={sections}
-                activeSection={activeSection}
+                locale={locale}
             />
         </div>
     );

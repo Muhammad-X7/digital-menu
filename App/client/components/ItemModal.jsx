@@ -1,5 +1,21 @@
 "use client";
 
+// components/ItemModal.jsx
+// Client Component — manages popup open/close side-effects.
+//
+// Client-side responsibilities:
+//   - useEffect to lock body scroll while the modal is open
+//   - useEffect to listen for Escape key to close
+//   - CSS keyframe animations (backdropIn, modalIn, sheetIn)
+//
+// Loaded lazily via next/dynamic in CategoryItemsGrid:
+//   const ItemModal = dynamic(() => import("./ItemModal"), { ssr: false })
+// This ensures the modal JS is NOT in the initial page bundle — it is only
+// downloaded after the user taps a card for the first time.
+//
+// ssr: false is correct here because:
+//   1. The modal is only visible after a user action (never on first paint)
+//   2. It accesses document.body directly in useEffect
 import { useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -13,13 +29,13 @@ export default function ItemModal({ item, isRtl = false, onClose }) {
 
     const currency = isRtl ? "د.ع" : "IQD";
 
-    // Lock body scroll when open
+    // Lock body scroll when open — cleanup restores scroll on unmount.
     useEffect(() => {
         document.body.style.overflow = "hidden";
         return () => { document.body.style.overflow = ""; };
     }, []);
 
-    // Close on Escape
+    // Close on Escape — cleanup removes the listener on unmount.
     useEffect(() => {
         function onKey(e) { if (e.key === "Escape") onClose(); }
         window.addEventListener("keydown", onKey);

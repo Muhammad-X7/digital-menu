@@ -1,9 +1,18 @@
+// components/CategoryCard.jsx
+// Pure Server Component — no "use client", no hooks, zero JS in the browser.
+//
+// Renders a static <Link> (next/link) pointing to the category page.
+// Since there is no interactivity beyond native browser navigation, this
+// component ships NO JavaScript to the client — it is rendered entirely to
+// HTML+CSS on the server.
+//
+// Used inside MenuGridClient (a Client Component). This is valid in React 19:
+// a Server Component can be imported and rendered inside a Client Component
+// as long as it uses no server-only APIs at render time. next/link and
+// next/image both work in both environments.
 import Link from "next/link";
 import Image from "next/image";
 
-// Pure server component — no interactivity, no hooks.
-// Receives all props from MenuGrid (a server component) and renders static HTML.
-// Zero JS shipped to the browser for this component.
 export default function CategoryCard({ category, locale, index = 0, isRtl = false }) {
     const isFirst = index === 0;
 

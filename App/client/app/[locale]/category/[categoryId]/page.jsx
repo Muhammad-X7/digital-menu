@@ -4,14 +4,6 @@ import TopNavBar from "../../../../components/TopNavBar";
 import CategoryItemsGrid from "../../../../components/CategoryItemsGrid";
 import { locales } from "../../../../i18n";
 
-// force-static: built once at deploy, served from CDN cache until the
-// /api/revalidate webhook fires revalidateTag("menu").
-export const dynamic = "force-static";
-
-// generateStaticParams tells Next.js every [locale]/[categoryId] combination
-// to pre-render at build time. Without this, force-static has no way to know
-// which routes exist. We fetch categories for every locale so all combinations
-// are covered.
 export async function generateStaticParams() {
     const params = [];
     for (const locale of locales) {
