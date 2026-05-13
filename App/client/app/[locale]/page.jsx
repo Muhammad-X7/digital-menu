@@ -1,14 +1,17 @@
-import { Suspense } from "react";
 import { getCategories, getSections } from "../../lib/strapi";
 import TopNavBar from "../../components/TopNavBar";
 import MenuGrid from "../../components/MenuGrid";
 
-export const revalidate = 60;
+// force-static: Next.js builds this page once at deploy time and serves it as
+// a pure static file. No server computation per request — as fast as a CDN can
+// physically deliver a file. The cache is only invalidated when Strapi fires
+// the webhook at /api/revalidate, which calls revalidateTag("menu").
+export const dynamic = "force-static";
 
-// MenuGrid uses useSearchParams() which requires a Suspense boundary in
-// Next.js App Router. Wrapping it here avoids the static generation bailout.
-export default async function MenuPage({ params }) {
+export default async function MenuPage({ params, searchParams }) {
     const { locale } = await params;
+    const { section } = await searchParams;
+    const activeSection = section ?? null;
 
     let categories = [];
     let sections = [];
@@ -25,9 +28,11 @@ export default async function MenuPage({ params }) {
     return (
         <div className="min-h-screen bg-[var(--background)]">
             <TopNavBar />
-            <Suspense>
-                <MenuGrid categories={categories} sections={sections} />
-            </Suspense>
+            <MenuGrid
+                categories={categories}
+                sections={sections}
+                activeSection={activeSection}
+            />
         </div>
     );
 }

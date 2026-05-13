@@ -1,8 +1,10 @@
-import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-const CategoryCard = memo(function CategoryCard({ category, locale, index = 0, isRtl = false }) {
+// Pure server component — no interactivity, no hooks.
+// Receives all props from MenuGrid (a server component) and renders static HTML.
+// Zero JS shipped to the browser for this component.
+export default function CategoryCard({ category, locale, index = 0, isRtl = false }) {
     const isFirst = index === 0;
 
     return (
@@ -52,6 +54,4 @@ const CategoryCard = memo(function CategoryCard({ category, locale, index = 0, i
             </div>
         </Link>
     );
-});
-
-export default CategoryCard;
+}

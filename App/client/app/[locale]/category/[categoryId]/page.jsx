@@ -2,12 +2,33 @@ import { notFound } from "next/navigation";
 import { getMenuItems, getCategories } from "../../../../lib/strapi";
 import TopNavBar from "../../../../components/TopNavBar";
 import CategoryItemsGrid from "../../../../components/CategoryItemsGrid";
+import { locales } from "../../../../i18n";
 
-export const revalidate = 60;
+// force-static: built once at deploy, served from CDN cache until the
+// /api/revalidate webhook fires revalidateTag("menu").
+export const dynamic = "force-static";
+
+// generateStaticParams tells Next.js every [locale]/[categoryId] combination
+// to pre-render at build time. Without this, force-static has no way to know
+// which routes exist. We fetch categories for every locale so all combinations
+// are covered.
+export async function generateStaticParams() {
+    const params = [];
+    for (const locale of locales) {
+        try {
+            const categories = await getCategories(locale);
+            for (const cat of categories) {
+                params.push({ locale, categoryId: cat.documentId });
+            }
+        } catch (err) {
+            console.error(`generateStaticParams failed for locale ${locale}:`, err);
+        }
+    }
+    return params;
+}
 
 export async function generateMetadata({ params }) {
     const { locale, categoryId } = await params;
-    // categoryId is a documentId string — stable across all locales
     try {
         const categories = await getCategories(locale);
         const cat = categories.find((c) => c.documentId === categoryId);
@@ -20,9 +41,6 @@ export async function generateMetadata({ params }) {
 
 export default async function CategoryPage({ params }) {
     const { locale, categoryId } = await params;
-    // categoryId is a documentId string (e.g. "abc123xyz"), NOT a numeric id.
-    // The same documentId resolves to the correct locale-specific entry in Strapi,
-    // so /en/category/abc123xyz and /ckb/category/abc123xyz both work correctly.
 
     let items = [];
     let categoryName = "";
@@ -33,13 +51,10 @@ export default async function CategoryPage({ params }) {
             getCategories(locale),
         ]);
 
-        // Match by documentId (locale-stable) not by numeric id (locale-specific)
         const cat = categories.find((c) => c.documentId === categoryId);
         if (!cat) notFound();
 
         categoryName = cat.name;
-        // Filter items using the locale-specific numeric id of the matched category,
-        // since menu items store categoryId as the numeric relation id.
         items = allItems.filter((i) => i.categoryId === cat.id);
     } catch (err) {
         console.error("Failed to fetch category page data:", err);

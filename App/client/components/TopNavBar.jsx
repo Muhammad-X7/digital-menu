@@ -1,11 +1,15 @@
-"use client";
+// Pure server component — previously "use client" only because it called
+// useTranslations(). next-intl exposes getTranslations() for server components,
+// which is identical in behaviour but runs at request time on the server.
+// This removes TopNavBar from the client JS bundle entirely.
+// LanguageSwitcher must stay "use client" (it uses router + state for the dropdown).
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-export default function TopNavBar() {
-    const t = useTranslations("nav");
+export default async function TopNavBar() {
+    const t = await getTranslations("nav");
 
     return (
         <header className="w-full bg-transparent px-8 pt-6 pb-3 flex flex-col items-center gap-3">

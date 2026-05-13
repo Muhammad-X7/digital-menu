@@ -1,7 +1,13 @@
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
 /**
- * Fetches data from Strapi REST API with 60-second revalidation.
+ * Fetches data from Strapi REST API.
+ *
+ * Uses Next.js cache tagging instead of time-based revalidation.
+ * All fetches are tagged "menu" so that a single revalidateTag("menu") call
+ * — triggered by the Strapi webhook at /api/revalidate — purges every cached
+ * Strapi response at once. Until that webhook fires, responses are served
+ * from the static cache indefinitely (as fast as a CDN file).
  */
 async function fetchStrapi(path, params = {}) {
   const url = new URL(`${STRAPI_URL}/api${path}`);
@@ -13,7 +19,7 @@ async function fetchStrapi(path, params = {}) {
   });
 
   const res = await fetch(url.toString(), {
-    next: { revalidate: 60 },
+    next: { tags: ["menu"] },
   });
 
   if (!res.ok) {
@@ -40,8 +46,6 @@ export async function getSections(locale) {
     const attrs = item.attributes ?? item;
     return {
       id: item.id,
-      // documentId is stable across all locales for the same section.
-      // Used in ?section= query param so the filter works regardless of locale.
       documentId: item.documentId ?? String(item.id),
       name: attrs.name ?? item.name,
       order: attrs.order ?? 0,
@@ -80,9 +84,6 @@ export async function getCategories(locale) {
 
     return {
       id: item.id,
-      // documentId is stable across all locales for the same category.
-      // Used in /category/[documentId] URLs so switching locale keeps the
-      // correct category regardless of locale-specific numeric ids.
       documentId: item.documentId ?? attrs.slug ?? String(item.id),
       name: attrs.name ?? item.name,
       slug: attrs.slug ?? item.slug,

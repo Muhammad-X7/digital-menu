@@ -1,117 +1,88 @@
-import { memo, useMemo } from "react";
-import Image from "next/image";
+// Pure server component — no "use client", no hooks, zero JS shipped for this file.
+// Previously this was a client component only because it used useSearchParams().
+// That hook is no longer needed here: page.jsx reads searchParams from its own
+// props (server-side, no hook required) and passes pre-filtered data down.
+// This means every CategoryCard inside also stays server-rendered.
 
-// memo: MenuCard is a pure presentational component. In the items grid there
-// can be many cards; without memo, every card re-renders whenever MenuGrid
-// state changes (e.g. another card's modal opens/closes). With memo + stable
-// onClick from MenuGrid's useCallback, cards only re-render when their own
-// item/index/isRtl props change.
-const MenuCard = memo(function MenuCard({ item, index = 0, isRtl = false, onClick }) {
-    // useMemo: price formatting is a non-trivial string operation (locale
-    // number formatting + character map replacement). Memoizing means it only
-    // recomputes when item.price or isRtl actually changes.
-    const formattedPrice = useMemo(
-        () =>
-            isRtl
-                ? Number(item.price).toLocaleString("en-US").replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d])
-                : Number(item.price).toLocaleString("en-US"),
-        [item.price, isRtl]
-    );
+import { getTranslations, getLocale } from "next-intl/server";
+import CategoryBar from "./CategoryBar";
+import CategoryCard from "./CategoryCard";
 
-    const currency = isRtl ? "د.ع" : "IQD";
+export default async function MenuGrid({ categories, sections, activeSection }) {
+    const locale = await getLocale();
+    const t = await getTranslations();
+    const isRtl = locale === "ar" || locale === "ckb";
+
+    // Filter visible sections by documentId match — done here on the server,
+    // no client-side useMemo needed.
+    const visibleSections =
+        activeSection === null
+            ? sections
+            : sections.filter((s) => s.documentId === activeSection);
 
     return (
-        <button
-            onClick={() => onClick(item)}
-            dir={isRtl ? "rtl" : "ltr"}
-            className="menu-card card-lift animate-fade-up rounded-[var(--radius-lg)] overflow-hidden bg-white border border-ink-100 cursor-pointer p-0 w-full opacity-0"
-            style={{
-                animationDelay: `${index * 50}ms`,
-                animationFillMode: "both",
-                textAlign: isRtl ? "right" : "left",
-            }}
-        >
-            {/* ── Desktop layout: vertical card ── */}
-            <div className="flex flex-col max-sm:hidden">
-                <div className="relative w-full pb-[75%]">
-                    {item.imageUrl ? (
-                        <Image
-                            src={item.imageUrl}
-                            alt={item.imageAlt || item.name}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 900px) 33vw, 300px"
-                            loading={index === 0 ? "eager" : "lazy"}
-                            priority={index === 0}
-                        />
-                    ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-brand-100 text-[2rem]">
-                            🍬
-                        </div>
-                    )}
-                </div>
+        <div className="w-full flex flex-col items-center">
+            {/*
+                CategoryBar must stay "use client" because it uses useLocale()
+                and useTranslations() for the pill labels and locale-aware hrefs.
+                It receives sections + activeSection as serializable props.
+            */}
+            <CategoryBar
+                sections={sections}
+                activeSection={activeSection}
+                isRtl={isRtl}
+            />
 
-                <div className="px-3.5 pt-3 pb-3.5">
-                    <p className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.35] mb-1.5">
-                        {item.name}
-                    </p>
-                    {item.description && (
-                        <p className="line-clamp-2 text-[0.78rem] font-light text-ink-500 leading-[1.4] mb-2">
-                            {item.description}
-                        </p>
-                    )}
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-[0.95rem] font-bold text-gold-600">
-                            {formattedPrice}
-                        </span>
-                        <span className="text-[0.68rem] font-normal text-ink-400 tracking-[0.06em]">
-                            {currency}
-                        </span>
+            <main className="w-full max-w-[900px] px-8 pt-10 sm:pt-0 pb-[60px]">
+                {visibleSections.length === 0 ? (
+                    <EmptyState label={t("item.unavailable")} />
+                ) : (
+                    <div className="flex flex-col gap-28 sm:gap-20">
+                        {visibleSections.map((sec) => {
+                            const sectionCats = categories.filter(
+                                (c) => c.sectionId === sec.id
+                            );
+                            if (sectionCats.length === 0) return null;
+
+                            return (
+                                <section key={sec.id}>
+                                    <h2
+                                        className="text-[2rem] sm:text-[2.4rem] font-extrabold text-ink-900 leading-[1.1] tracking-[-0.02em] pb-10 sm:p-12 text-center"
+                                        dir={isRtl ? "rtl" : "ltr"}
+                                    >
+                                        {sec.name}
+                                    </h2>
+
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                                        {sectionCats.map((cat, i) => (
+                                            <CategoryCard
+                                                key={cat.id}
+                                                category={cat}
+                                                locale={locale}
+                                                index={i}
+                                                isRtl={isRtl}
+                                            />
+                                        ))}
+                                    </div>
+                                </section>
+                            );
+                        })}
                     </div>
-                </div>
-            </div>
-
-            {/* ── Mobile layout: horizontal row ── */}
-            <div className="hidden max-sm:flex flex-row-reverse items-center gap-3.5 px-3.5 py-3">
-                <div className="relative w-[100px] shrink-0 rounded-[var(--radius-md)] overflow-hidden aspect-square">
-                    {item.imageUrl ? (
-                        <Image
-                            src={item.imageUrl}
-                            alt={item.imageAlt || item.name}
-                            fill
-                            className="object-cover"
-                            sizes="100px"
-                            loading={index === 0 ? "eager" : "lazy"}
-                            priority={index === 0}
-                        />
-                    ) : (
-                        <div className="w-full h-full bg-brand-100 flex items-center justify-center text-[1.6rem]">
-                            🍬
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                    <p className="line-clamp-2 text-[0.95rem] font-semibold text-ink-900 leading-[1.3]">
-                        {item.name}
-                    </p>
-                    {item.description && (
-                        <p className="text-[0.78rem] font-light text-ink-500 leading-[1.4] whitespace-normal break-words">
-                            {item.description}
-                        </p>
-                    )}
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-[0.92rem] font-bold text-gold-600">
-                            {formattedPrice}
-                        </span>
-                        <span className="text-[0.65rem] font-normal text-ink-400 tracking-[0.06em]">
-                            {currency}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </button>
+                )}
+            </main>
+        </div>
     );
-});
+}
 
-export default MenuCard;
+// Extracted so it can receive the translated string as a prop — keeps this
+// component free of any client-only hooks.
+function EmptyState({ label }) {
+    return (
+        <div className="flex flex-col items-center justify-center text-center pt-[80px] pb-[80px]">
+            <div className="w-16 h-16 rounded-full bg-ink-100 flex items-center justify-center text-[1.8rem] mb-4">
+                🍬
+            </div>
+            <p className="text-[0.88rem] font-light text-ink-400">{label}</p>
+        </div>
+    );
+}
