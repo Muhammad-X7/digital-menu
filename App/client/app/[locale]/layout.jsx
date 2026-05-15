@@ -1,10 +1,11 @@
 // app/[locale]/layout.jsx
 // Server Component — no "use client".
 // Provides locale context to the entire subtree via NextIntlClientProvider.
-// Switching to a new locale re-renders only this layout and its children on
-// the server; the client bundle stays lean.
+// setRequestLocale() is called before any next-intl API so that all Server
+// Components in this subtree can read the locale statically — no dynamic
+// rendering, no x-next-intl-locale header, no Cache-Control: no-store.
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "../../i18n";
 import "../globals.css";
@@ -44,10 +45,12 @@ export default async function LocaleLayout({ children, params }) {
 
     if (!locales.includes(locale)) notFound();
 
-    // getMessages() reads from the messages/<locale>.json file on the server.
-    // Passing the messages object to NextIntlClientProvider is required so
-    // that "use client" components (LanguageSwitcher, CategoryItemsGrid, etc.)
-    // can call useTranslations() without a separate network request.
+    // Must be called before any next-intl API (getMessages, useTranslations, etc.)
+    // This writes the locale into a request-scoped cache so all Server Components
+    // in this subtree read it statically — avoiding the x-next-intl-locale header
+    // that would otherwise force dynamic rendering and break Vercel CDN caching.
+    setRequestLocale(locale);
+
     const messages = await getMessages();
     const isRtl = locale === "ar" || locale === "ckb";
 
