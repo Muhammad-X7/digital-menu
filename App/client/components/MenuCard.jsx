@@ -49,7 +49,7 @@ const MenuCard = memo(function MenuCard({ item, index = 0, isRtl = false, onClic
                             fill
                             className="object-cover"
                             sizes="(max-width: 900px) 33vw, 300px"
-                            loading={index === 0 ? "eager" : "lazy"}
+                            loading={index === 0 ? undefined : "lazy"}
                             priority={index === 0}
                         />
                     ) : (
@@ -89,7 +89,7 @@ const MenuCard = memo(function MenuCard({ item, index = 0, isRtl = false, onClic
                             fill
                             className="object-cover"
                             sizes="100px"
-                            loading={index === 0 ? "eager" : "lazy"}
+                            loading={index === 0 ? undefined : "lazy"}
                             priority={index === 0}
                         />
                     ) : (

@@ -35,7 +35,7 @@ export default function CategoryCard({ category, locale, index = 0, isRtl = fals
                         className="object-cover"
                         sizes="(max-width: 600px) 60vw, 30vw"
                         priority={isFirst}
-                        loading={isFirst ? "eager" : "lazy"}
+                        loading={isFirst ? undefined : "lazy"}
                     />
                 ) : (
                     <div className="w-full h-full bg-brand-100 flex items-center justify-center text-[3rem]">

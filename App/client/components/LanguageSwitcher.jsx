@@ -8,11 +8,11 @@
 //   2. switchLocale — replaces the locale segment in the URL path while
 //      preserving any existing query params (e.g. ?section=documentId)
 //   3. Outside-click handler via useEffect + ref
-//
-// useCallback on switchLocale: the function closes over locale, pathname,
-// router, and searchParams. Without useCallback it would be recreated on
-// every render, which — while not breaking anything — makes the dep arrays
-// of any downstream hooks that reference it less stable.
+//   4. Prefetch all other locale routes on mount so switching is instant —
+//      Next.js downloads the static HTML in the background before the user
+//      clicks. This eliminates the "Rendering..." delay caused by the server
+//      round-trip (and any Strapi cold-start on Render's free tier).
+//   5. Prefetch on hover as a secondary safety net for first-render misses.
 import { useLocale } from "next-intl";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -24,6 +24,13 @@ const LABELS = {
     ckb: "کوردی",
 };
 
+/** Returns the target path for a given locale, preserving any sub-paths. */
+function buildLocalePath(pathname, newLocale) {
+    const segments = pathname.split("/");
+    segments[1] = newLocale;
+    return segments.join("/");
+}
+
 export default function LanguageSwitcher() {
     const locale = useLocale();
     const router = useRouter();
@@ -33,12 +40,40 @@ export default function LanguageSwitcher() {
     const ref = useRef(null);
     const isRtl = locale === "ar" || locale === "ckb";
 
+    // ── Fix #1: Prefetch all other locale routes on mount ──────────────────
+    // Since all locale pages are statically generated (generateStaticParams),
+    // they already exist as static files on the CDN. Calling router.prefetch()
+    // fetches and caches them in the background immediately — so by the time
+    // the user opens the dropdown and clicks, the navigation is instant with
+    // no server round-trip and no "Rendering..." indicator.
+    useEffect(() => {
+        locales.forEach((loc) => {
+            if (loc !== locale) {
+                router.prefetch(buildLocalePath(pathname, loc));
+            }
+        });
+    }, [locale, pathname, router]);
+
+    // ── Fix #2: Prefetch on hover as a safety net ──────────────────────────
+    // Covers the edge case where the mount prefetch hasn't resolved yet
+    // (e.g. slow connection). By the time the user moves from hover to click,
+    // the prefetch is guaranteed to have fired.
+    const handleHover = useCallback(
+        (loc) => {
+            if (loc !== locale) {
+                router.prefetch(buildLocalePath(pathname, loc));
+            }
+        },
+        [locale, pathname, router]
+    );
+
+    // ── switchLocale ───────────────────────────────────────────────────────
+    // useCallback: stable reference so dep arrays of downstream hooks don't
+    // invalidate on every render.
     const switchLocale = useCallback(
         (newLocale) => {
             if (newLocale === locale) { setOpen(false); return; }
-            const segments = pathname.split("/");
-            segments[1] = newLocale;
-            const newPath = segments.join("/");
+            const newPath = buildLocalePath(pathname, newLocale);
             // Preserve any existing query params (e.g. ?section=documentId)
             // so the active section filter survives a locale switch.
             const qs = searchParams.toString();
@@ -88,6 +123,8 @@ export default function LanguageSwitcher() {
                             <button
                                 key={loc}
                                 onClick={() => switchLocale(loc)}
+                                onMouseEnter={() => handleHover(loc)}
+                                onFocus={() => handleHover(loc)}
                                 className={`
                                     w-full px-4 py-2.5 text-[0.88rem] border-none cursor-pointer block
                                     transition-colors duration-[120ms] ease-in-out
