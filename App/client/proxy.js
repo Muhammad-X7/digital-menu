@@ -2,6 +2,8 @@ import createMiddleware from "next-intl/middleware";
 import { defineRouting } from "next-intl/routing";
 import { locales, defaultLocale } from "./i18n";
 
+console.log("proxy running");
+
 const routing = defineRouting({
   locales,
   defaultLocale,
