@@ -32,7 +32,9 @@ export default async function TopNavBar() {
                     <LanguageSwitcher />
                 </Suspense>
             </div>
-            <p className="text-xl font-normal text-ink-800 tracking-[0.01em] text-center leading-normal">
+            {/* <p className="text-xl font-normal text-ink-800 tracking-[0.01em] text-center leading-normal"> */}
+            <p className="font-normal text-ink-800 tracking-[0.01em] text-center leading-normal whitespace-nowrap" style={{ fontSize: "clamp(0.85rem, 4vw, 1.25rem)" }}>
+
                 {t("tagline")}
             </p>
         </header>
