@@ -3,19 +3,15 @@
 // components/MenuGridClient.jsx
 // Client Component — owns section-filter state only.
 //
-// Receives all data as serialisable props from MenuGrid (Server Component).
-// No data fetching, no Strapi calls. The only client-side work is:
-//   - useState for the active section pill
-//   - Derived `visibleSections` via Array.filter (cheap, synchronous)
+// activeSection is stored in the URL as ?section=documentId so that:
+//   - switching locale preserves the selected section (LanguageSwitcher
+//     already forwards all query params via searchParams.toString())
+//   - the back button and sharing a URL both restore the correct filter
 //
-// CategoryBar and CategoryCard are rendered here:
-//   - CategoryBar: Client Component (pill click handlers)
-//   - CategoryCard: Server Component rendered inside a Client Component tree.
-//     This is valid in React 19 — Server Components can be passed as children
-//     or rendered directly inside Client Components when they carry no server-
-//     only APIs. Since CategoryCard only uses next/link and next/image (both
-//     work in client trees), it renders correctly with zero JS overhead.
-import { useState } from "react";
+// useRouter + useSearchParams replace useState for this one piece of state.
+// Everything else is unchanged.
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import CategoryBar from "./CategoryBar";
 import CategoryCard from "./CategoryCard";
 
@@ -27,8 +23,27 @@ export default function MenuGridClient({
     emptyLabel,
     allLabel,
 }) {
-    // activeSection: null = show all; string documentId = show one section.
-    const [activeSection, setActiveSection] = useState(null);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Read active section from URL — null means "All"
+    const activeSection = searchParams.get("section") || null;
+
+    // Write active section to URL — preserves any other query params
+    const setActiveSection = useCallback(
+        (documentId) => {
+            const params = new URLSearchParams(searchParams.toString());
+            if (documentId === null) {
+                params.delete("section");
+            } else {
+                params.set("section", documentId);
+            }
+            const qs = params.toString();
+            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+        },
+        [router, pathname, searchParams]
+    );
 
     const visibleSections =
         activeSection === null
