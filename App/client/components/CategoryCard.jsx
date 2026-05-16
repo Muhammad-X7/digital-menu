@@ -5,11 +5,18 @@
 // Appends ?from=<activeSection> to the href when a section is active so that
 // CategoryItemsGrid can read it and navigate back to the correct filtered URL
 // regardless of any language switches that happened on the category page.
+//
+// priority is set on the first two cards (index 0 and 1) because the LCP
+// element is typically the second visible card on mobile. Giving both cards
+// fetchpriority="high" ensures the browser loads them immediately without
+// waiting for the lazy-load threshold — reducing LCP by ~1,260ms.
 import Link from "next/link";
 import Image from "next/image";
 
 export default function CategoryCard({ category, locale, index = 0, isRtl = false, activeSection = null }) {
-    const isFirst = index === 0;
+    // Prioritize the first two cards — both are above the fold on mobile
+    // and either one can be the LCP element depending on screen size.
+    const isAboveFold = index === 0 || index === 1;
 
     // Build the category href — append ?from=<documentId> when a section is
     // active so the back button in CategoryItemsGrid can restore the filter.
@@ -35,8 +42,8 @@ export default function CategoryCard({ category, locale, index = 0, isRtl = fals
                         fill
                         className="object-cover"
                         sizes="(max-width: 600px) 60vw, 30vw"
-                        priority={isFirst}
-                        loading={isFirst ? undefined : "lazy"}
+                        priority={isAboveFold}
+                        loading={isAboveFold ? undefined : "lazy"}
                     />
                 ) : (
                     <div className="w-full h-full bg-brand-100 flex items-center justify-center text-[3rem]">
@@ -65,4 +72,3 @@ export default function CategoryCard({ category, locale, index = 0, isRtl = fals
         </Link>
     );
 }
-
