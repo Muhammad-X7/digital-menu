@@ -40,7 +40,7 @@ export default function MenuGridClient({
                 params.set("section", documentId);
             }
             const qs = params.toString();
-            router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+            router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
         },
         [router, pathname, searchParams]
     );
