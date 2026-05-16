@@ -10,17 +10,21 @@
 //   3. Lazy-loading ItemModal via next/dynamic — the modal JS is excluded from
 //      the initial bundle and only downloaded after the first card tap
 //
-// The Back button uses router.back() when there is browser history so that
-// the exact previous URL — including any ?section= query param — is restored.
-// If the user arrived directly (shared link, typed URL), window.history.length
-// is 1 and there is nothing to go back to, so we fall back to /${locale}.
+// Back navigation strategy:
+//   CategoryCard embeds ?from=<sectionDocumentId> in the category href when
+//   a section filter is active. handleBack reads that param and navigates
+//   directly to /${locale}?section=<from> — bypassing the browser history
+//   stack entirely. This means language switches on this page (which add new
+//   history entries) don't interfere with the back destination.
+//   If no ?from= param exists (user came from "All" or direct URL),
+//   handleBack goes to /${locale} with no section filter.
 //
 // MenuCard is a "use client" component (it has an onClick prop). It is
 // memoized so that changing selectedItem (e.g. opening/closing a modal) does
 // NOT re-render every card — only the modal itself re-renders.
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import MenuCard from "./MenuCard";
 
@@ -32,17 +36,21 @@ export default function CategoryItemsGrid({ items, categoryName, locale }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const t = useTranslations();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const isRtl = locale === "ar" || locale === "ckb";
 
-    // router.back() restores the exact previous URL including ?section= param.
-    // Falls back to /${locale} if the user arrived directly with no history.
+    // Read the section the user came from — set by CategoryCard in the href.
+    // Navigate directly to /${locale}?section=<from> instead of using
+    // router.back() so that language switches on this page don't affect
+    // where the back button goes.
     const handleBack = useCallback(() => {
-        if (window.history.length > 1) {
-            router.back();
+        const from = searchParams.get("from");
+        if (from) {
+            router.push(`/${locale}?section=${from}`);
         } else {
             router.push(`/${locale}`);
         }
-    }, [router, locale]);
+    }, [router, locale, searchParams]);
 
     // useCallback: stable reference prevents MenuCard re-renders caused by
     // a new function identity on every CategoryItemsGrid render.

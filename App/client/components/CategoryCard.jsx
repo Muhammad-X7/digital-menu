@@ -1,24 +1,25 @@
 // components/CategoryCard.jsx
 // Pure Server Component — no "use client", no hooks, zero JS in the browser.
 //
-// Renders a static <Link> (next/link) pointing to the category page.
-// Since there is no interactivity beyond native browser navigation, this
-// component ships NO JavaScript to the client — it is rendered entirely to
-// HTML+CSS on the server.
-//
-// Used inside MenuGridClient (a Client Component). This is valid in React 19:
-// a Server Component can be imported and rendered inside a Client Component
-// as long as it uses no server-only APIs at render time. next/link and
-// next/image both work in both environments.
+// Renders a static <Link> pointing to the category page.
+// Appends ?from=<activeSection> to the href when a section is active so that
+// CategoryItemsGrid can read it and navigate back to the correct filtered URL
+// regardless of any language switches that happened on the category page.
 import Link from "next/link";
 import Image from "next/image";
 
-export default function CategoryCard({ category, locale, index = 0, isRtl = false }) {
+export default function CategoryCard({ category, locale, index = 0, isRtl = false, activeSection = null }) {
     const isFirst = index === 0;
+
+    // Build the category href — append ?from=<documentId> when a section is
+    // active so the back button in CategoryItemsGrid can restore the filter.
+    const href = activeSection
+        ? `/${locale}/category/${category.documentId}?from=${activeSection}`
+        : `/${locale}/category/${category.documentId}`;
 
     return (
         <Link
-            href={`/${locale}/category/${category.documentId}`}
+            href={href}
             className="card-lift animate-fade-up relative w-full h-[230px] rounded-[var(--radius-xl)] overflow-hidden bg-brand-100 border-none cursor-pointer text-left p-0 opacity-0 shadow-[0_2px_16px_rgba(0,0,0,0.08)] transition-[transform,box-shadow] duration-[220ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(60,40,10,0.12)] block"
             style={{
                 animationDelay: `${index * 60}ms`,

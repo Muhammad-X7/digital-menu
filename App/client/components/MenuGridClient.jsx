@@ -8,8 +8,9 @@
 //     already forwards all query params via searchParams.toString())
 //   - the back button and sharing a URL both restore the correct filter
 //
-// useRouter + useSearchParams replace useState for this one piece of state.
-// Everything else is unchanged.
+// activeSection is also passed to CategoryCard so it can embed ?from=
+// in the category href — allowing CategoryItemsGrid to navigate back to
+// the correct filtered URL even after a language switch on the category page.
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import CategoryBar from "./CategoryBar";
@@ -52,10 +53,6 @@ export default function MenuGridClient({
 
     return (
         <div className="w-full flex flex-col items-center">
-            {/*
-              CategoryBar is a "use client" component — it renders the pill
-              buttons and calls onSectionChange (which sets state here).
-            */}
             <CategoryBar
                 sections={sections}
                 isRtl={isRtl}
@@ -96,6 +93,7 @@ export default function MenuGridClient({
                                                 locale={locale}
                                                 index={i}
                                                 isRtl={isRtl}
+                                                activeSection={activeSection}
                                             />
                                         ))}
                                     </div>
