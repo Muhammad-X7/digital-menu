@@ -65,3 +65,4 @@ export default function CategoryCard({ category, locale, index = 0, isRtl = fals
         </Link>
     );
 }
+
