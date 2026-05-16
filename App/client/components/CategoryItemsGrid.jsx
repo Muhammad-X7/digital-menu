@@ -3,12 +3,13 @@
 // components/CategoryItemsGrid.jsx
 // Client Component — owns ItemModal open/close state only.
 //
-// Data arrives as plain serialisable props from the CategoryPage Server
-// Component — no fetching happens here. The client-side responsibilities are:
-//   1. selectedItem state — which item's modal is open (null = closed)
-//   2. handleItemClick / handleModalClose — stable callbacks via useCallback
-//   3. Lazy-loading ItemModal via next/dynamic — the modal JS is excluded from
-//      the initial bundle and only downloaded after the first card tap
+// useSearchParams() requires a Suspense boundary during static generation.
+// The component is split into two parts:
+//   - CategoryItemsGrid: the exported shell that provides the Suspense boundary
+//   - CategoryItemsGridInner: the actual implementation that calls useSearchParams
+//
+// This keeps the Suspense boundary co-located with the component that needs it
+// rather than pushing it up to page.jsx.
 //
 // Back navigation strategy:
 //   CategoryCard embeds ?from=<sectionDocumentId> in the category href when
@@ -18,11 +19,7 @@
 //   history entries) don't interfere with the back destination.
 //   If no ?from= param exists (user came from "All" or direct URL),
 //   handleBack goes to /${locale} with no section filter.
-//
-// MenuCard is a "use client" component (it has an onClick prop). It is
-// memoized so that changing selectedItem (e.g. opening/closing a modal) does
-// NOT re-render every card — only the modal itself re-renders.
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -32,7 +29,8 @@ import MenuCard from "./MenuCard";
 // ssr: false because the modal uses document.body and window (browser APIs).
 const ItemModal = dynamic(() => import("./ItemModal"), { ssr: false });
 
-export default function CategoryItemsGrid({ items, categoryName, locale }) {
+// Inner component — calls useSearchParams, must be inside <Suspense>.
+function CategoryItemsGridInner({ items, categoryName, locale }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const t = useTranslations();
     const router = useRouter();
@@ -52,8 +50,6 @@ export default function CategoryItemsGrid({ items, categoryName, locale }) {
         }
     }, [router, locale, searchParams]);
 
-    // useCallback: stable reference prevents MenuCard re-renders caused by
-    // a new function identity on every CategoryItemsGrid render.
     const handleItemClick = useCallback((item) => {
         setSelectedItem(item);
     }, []);
@@ -100,7 +96,6 @@ export default function CategoryItemsGrid({ items, categoryName, locale }) {
                 )}
             </main>
 
-            {/* ItemModal only mounts when an item is selected */}
             {selectedItem && (
                 <ItemModal
                     item={selectedItem}
@@ -109,6 +104,16 @@ export default function CategoryItemsGrid({ items, categoryName, locale }) {
                 />
             )}
         </div>
+    );
+}
+
+// Exported shell — provides the Suspense boundary required by useSearchParams
+// during static generation. fallback={null} prevents layout shift.
+export default function CategoryItemsGrid(props) {
+    return (
+        <Suspense fallback={null}>
+            <CategoryItemsGridInner {...props} />
+        </Suspense>
     );
 }
 
