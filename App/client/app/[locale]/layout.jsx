@@ -13,6 +13,15 @@ import "../globals.css";
 export const metadata = {
     title: "Jiggly Cake",
     description: "Jiggly Cake — Japanese cheesecake, soft as silk.",
+    icons: {
+        icon: [
+            { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+            { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+        ],
+        apple: [
+            { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+        ],
+    },
     openGraph: {
         title: "Jiggly Cake",
         description: "Jiggly Cake — Japanese cheesecake, soft as silk.",
